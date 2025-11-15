@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "E-Bulod Equipment Borrowing System",
   "scripts": {
-    "build": "echo 'No build step required'"
+    "build": "echo 'No build step required'",
+    "vercel-build": "echo 'No build step required'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0"
