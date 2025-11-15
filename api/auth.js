@@ -11,40 +11,16 @@ const {
   sanitizeInput
 } = require('./config.js');
 
-// Helper to parse request body for Vercel
-function parseBody(req) {
-  return new Promise((resolve) => {
-    if (req.method === 'GET' || req.method === 'DELETE') {
-      resolve({});
-      return;
-    }
-    
-    // Vercel might already parse the body
-    if (req.body && typeof req.body === 'object') {
-      resolve(req.body);
-      return;
-    }
-    
-    // Otherwise, parse it manually
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      try {
-        resolve(body ? JSON.parse(body) : {});
-      } catch (e) {
-        resolve({});
-      }
-    });
-    req.on('error', () => resolve({}));
-  });
-}
-
-// Vercel serverless function handler
-async function handler(req, res) {
-  // Handle CORS
-  if (handlePreflight(req, res)) return;
+module.exports = async (req, res) => {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-User-Id, Authorization');
+    res.status(200).end();
+    return;
+  }
+  
   setCORSHeaders(res);
   
   try {
@@ -52,19 +28,35 @@ async function handler(req, res) {
     
     switch (method) {
       case 'POST': {
-        // Vercel automatically parses JSON body
+        // Parse request body - Vercel may auto-parse or we need to parse manually
         let body = {};
         if (req.body) {
           if (typeof req.body === 'string') {
             try {
               body = JSON.parse(req.body);
             } catch (e) {
+              console.error('JSON parse error:', e);
               body = {};
             }
           } else {
             body = req.body;
           }
+        } else {
+          // If body is not available, try to read from stream
+          const chunks = [];
+          for await (const chunk of req) {
+            chunks.push(chunk);
+          }
+          const bodyString = Buffer.concat(chunks).toString();
+          if (bodyString) {
+            try {
+              body = JSON.parse(bodyString);
+            } catch (e) {
+              body = {};
+            }
+          }
         }
+        
         const userId = sanitizeInput(body.userId || '');
         const password = sanitizeInput(body.password || '');
         
@@ -151,10 +143,8 @@ async function handler(req, res) {
     }
   } catch (error) {
     console.error('Auth API error:', error);
+    console.error('Error stack:', error.stack);
     const response = sendError('Server error: ' + error.message, 500);
     res.status(response.statusCode).json(JSON.parse(response.body));
   }
-}
-
-// Export for Vercel
-module.exports = handler;
+};
