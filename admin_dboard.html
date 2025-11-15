@@ -3287,14 +3287,14 @@
         clearInterval(notificationRefreshInterval);
       }
       
-      // Refresh every 30 seconds
+      // Refresh every 2 minutes (reduced from 30s to save Edge Requests)
       notificationRefreshInterval = setInterval(async () => {
         try {
           await loadNotifications();
         } catch (error) {
           console.error("Error auto-refreshing notifications:", error);
         }
-      }, 30000); // 30 seconds
+      }, 120000); // 2 minutes
     }
     
     function stopNotificationAutoRefresh() {
@@ -3335,7 +3335,7 @@
         } catch (error) {
           console.error("Error updating badge:", error);
         }
-      }, 60000); // Update every minute
+      }, 180000); // Update every 3 minutes (reduced from 1 minute to save Edge Requests)
 
       // Load initial section
       const saved = localStorage.getItem('adminActiveSection') || 'dashboard';

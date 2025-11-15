@@ -2521,7 +2521,7 @@
 
     // Real-time Notification Polling
     function startNotificationPolling() {
-      // Poll every 10 seconds for new notifications
+      // Poll every 60 seconds for new notifications (reduced from 10s to save Edge Requests)
       notificationPollInterval = setInterval(async () => {
         try {
           const currentNotifications = await NotificationsAPI.getAll();
