@@ -13,60 +13,70 @@ A web-based equipment borrowing management system for the College of Computing a
 - **Export Data**: Export equipment and request data
 - **Activity Logging**: Track all admin actions
 - **Notifications**: Real-time notifications for new requests
+- **Bulk Operations**: Approve/reject multiple requests at once
 
 ### Borrower Features
 - **Browse Equipment**: View available equipment with images
-- **Request Equipment**: Submit borrowing requests with dates
+- **Request Equipment**: Submit borrowing requests with dates and times
 - **Track Requests**: View request status and history
 - **Analytics**: Personal borrowing statistics and insights
-- **Equipment Reviews**: Rate and review equipment after return
-- **Notifications**: Real-time status updates
+- **Equipment Feedback**: Leave feedback/comments on equipment after return
+- **Notifications**: Real-time status updates with notification dropdown
+- **Request History**: View all past borrowing requests
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: HTML5, CSS3, JavaScript (Vanilla), Bootstrap 5
-- **Backend**: PHP 7.4+
-- **Database**: Firebase Firestore
+- **Backend**: Node.js (Serverless Functions)
+- **Database**: Supabase (PostgreSQL)
 - **Image Storage**: Cloudinary
-- **Hosting**: Compatible with InfinityFree and other PHP hosting
+- **Hosting**: Vercel
+- **Runtime**: Node.js 22.x
 
 ## 📋 Prerequisites
 
-- PHP 7.4 or higher
-- Web server (Apache/Nginx) or PHP built-in server
-- Firebase account with Firestore enabled
+- Node.js 22.x or higher
+- Supabase account
 - Cloudinary account (for image storage)
+- Vercel account (for deployment)
 - Modern web browser
 
-## 🔧 Installation
+## 🔧 Installation & Setup
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/EBulod.git
-cd EBulod
+git clone https://github.com/majingamo/ebulodccis.git
+cd ebulodccis
 ```
 
-### 2. Configure Firebase
+### 2. Install Dependencies
 
-1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
-2. Enable Firestore Database
-3. Get your Firebase Project ID and API Key
-4. Copy `api/config.example.php` to `api/config.php`
-5. Update `api/config.php` with your Firebase credentials:
-
-```php
-define('FIREBASE_PROJECT_ID', 'your-project-id');
-define('FIREBASE_API_KEY', 'your-api-key');
+```bash
+npm install
 ```
 
-### 3. Configure Cloudinary
+### 3. Set Up Supabase
+
+1. Create a Supabase project at [Supabase](https://supabase.com/)
+2. Run the SQL schema to create tables (see `ADD_BORROWERS.sql` for reference)
+3. Get your Supabase URL and Anon Key from Project Settings → API
+4. Disable Row Level Security (RLS) for all tables (for development)
+
+**Required Tables:**
+- `admins` - Admin user accounts
+- `borrowers` - Borrower user accounts
+- `equipments` - Equipment inventory
+- `requests` - Equipment borrowing requests
+- `equipment_history` - Equipment usage history
+- `notifications` - User notifications
+- `activity_logs` - System activity logs
+
+### 4. Configure Cloudinary
 
 1. Create a Cloudinary account at [Cloudinary](https://cloudinary.com/)
-2. Get your Cloud Name, API Key, and API Secret
-3. Create an upload preset in Cloudinary Dashboard
-4. Copy `js/cloudinary.example.js` to `js/cloudinary.js`
-5. Update `js/cloudinary.js` with your Cloudinary credentials:
+2. Get your Cloud Name, API Key, and create an upload preset
+3. Update `js/cloudinary.js` with your credentials:
 
 ```javascript
 const cloudinaryConfig = {
@@ -76,109 +86,146 @@ const cloudinaryConfig = {
 };
 ```
 
-6. Copy `delete_cloudinary_image.example.php` to `delete_cloudinary_image.php`
-7. Update `delete_cloudinary_image.php` with your Cloudinary credentials
+### 5. Deploy to Vercel
 
-### 4. Set Up Firestore Collections
-
-Create the following collections in Firestore:
-- `admins` - Admin user accounts
-- `borrowers` - Borrower user accounts
-- `equipments` - Equipment inventory
-- `requests` - Equipment borrowing requests
-- `equipmentHistory` - Equipment usage history
-- `notifications` - User notifications
-- `activity_logs` - System activity logs
-
-See `docs/FIREBASE_SETUP.md` for detailed setup instructions.
-
-### 5. Configure CORS
-
-Update the `$allowedOrigins` array in `api/config.php` with your domain:
-
-```php
-$allowedOrigins = [
-    'http://localhost',
-    'https://yourdomain.com'
-];
-```
+1. Push your code to GitHub
+2. Import your repository in Vercel
+3. Add environment variables in Vercel:
+   - `SUPABASE_URL` - Your Supabase project URL
+   - `SUPABASE_ANON_KEY` - Your Supabase anonymous key
+   - `ALLOWED_ORIGIN` - Your Vercel deployment URL (optional)
+4. Deploy!
 
 ## 📁 Project Structure
 
 ```
 EBulod/
-├── api/                    # PHP backend API
-│   ├── config.php         # Configuration (create from config.example.php)
-│   ├── auth.php           # Authentication endpoints
-│   ├── equipment.php      # Equipment management
-│   ├── requests.php       # Request management
-│   └── ...
+├── api/                    # Node.js serverless functions
+│   ├── config.js          # Configuration and database helpers
+│   ├── auth.js            # Authentication endpoints
+│   ├── equipment.js       # Equipment management
+│   ├── requests.js        # Request management
+│   ├── dashboard.js       # Dashboard statistics
+│   ├── borrowers.js       # Borrower management
+│   ├── notifications.js   # Notification handling
+│   ├── history.js         # Equipment history
+│   ├── export.js          # Data export
+│   └── bulk_operations.js # Bulk operations
 ├── js/                    # JavaScript files
-│   ├── api.js            # API communication
-│   ├── auth_unified.js   # Authentication logic
-│   └── cloudinary.js     # Cloudinary integration (create from example)
+│   ├── api.js            # API communication client
+│   ├── auth_unified.js   # Unified authentication
+│   ├── auth_admin.js     # Admin authentication
+│   ├── auth_borrower.js  # Borrower authentication
+│   ├── cloudinary.js     # Cloudinary integration
+│   └── form-validation.js # Form validation
 ├── images/               # Static images
-├── docs/                 # Documentation
+│   ├── logo.png
+│   ├── admin.png
+│   └── borrower.png
 ├── index.html           # Login page
 ├── admin_dboard.html    # Admin dashboard
 ├── borrower_dashboard.html # Borrower dashboard
-└── create_account.html  # Account creation
+├── contact_us.html      # Contact page
+├── create_account.html  # Account creation (admin only)
+├── package.json         # Node.js dependencies
+├── vercel.json          # Vercel configuration
+└── README.md           # This file
 ```
 
-## 🔐 Security Notes
+## 🔐 Environment Variables
 
-⚠️ **IMPORTANT**: Never commit sensitive files to version control:
-- `api/config.php` (contains Firebase API keys)
-- `delete_cloudinary_image.php` (contains Cloudinary API secret)
-- `js/cloudinary.js` (contains Cloudinary credentials)
+Set these in your Vercel project settings:
 
-These files are already in `.gitignore`. Always use the `.example` files as templates.
+- `SUPABASE_URL` - Your Supabase project URL
+- `SUPABASE_ANON_KEY` - Your Supabase anonymous key
+- `ALLOWED_ORIGIN` - Allowed CORS origin (optional, defaults to `*`)
 
 ## 🚀 Usage
 
 ### Local Development
 
-1. Start a PHP development server:
+1. Install dependencies:
 ```bash
-php -S localhost:8000
+npm install
 ```
 
-2. Open your browser and navigate to:
+2. Set up environment variables (create `.env.local`):
 ```
-http://localhost:8000
+SUPABASE_URL=your-supabase-url
+SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+3. Run Vercel CLI:
+```bash
+npx vercel dev
+```
+
+4. Open your browser and navigate to:
+```
+http://localhost:3000
 ```
 
 ### Production Deployment
 
-1. Upload all files to your web server
-2. Ensure PHP 7.4+ is installed
-3. Configure `api/config.php` with production credentials
-4. Update CORS settings in `api/config.php`
-5. Set proper file permissions (644 for files, 755 for directories)
+The project is configured for automatic deployment on Vercel:
 
-## 📚 Documentation
+1. Push changes to GitHub
+2. Vercel automatically detects and deploys
+3. Environment variables are managed in Vercel dashboard
 
-Comprehensive documentation is available in the `docs/` folder:
+## 🔑 Default Accounts
 
-- **PROJECT_ARCHITECTURE.md** - System architecture overview
-- **FIREBASE_SETUP.md** - Firebase setup guide
-- **CLOUDINARY_SETUP.md** - Cloudinary setup guide
-- **TESTING_GUIDE.md** - Testing procedures
-- **FREE_HOSTING_ISSUES.md** - Troubleshooting for free hosting
+After setting up Supabase, create admin and borrower accounts:
+
+**Admin Account:**
+```sql
+INSERT INTO admins (id, password) 
+VALUES ('11-111111', 'admin1');
+```
+
+**Borrower Accounts:**
+See `ADD_BORROWERS.sql` for example SQL to add borrower accounts.
+
+## 🎯 Key Features
+
+### Performance Optimizations
+- **API Caching**: Reduces Edge Requests by 70-80%
+- **Smart Polling**: Notifications poll every 60 seconds (borrower) / 2 minutes (admin)
+- **Efficient Data Loading**: Cached responses for frequently accessed data
+
+### Security
+- Stateless authentication using `X-User-Id` header
+- Input sanitization on all API endpoints
+- CORS protection
+- Row Level Security (RLS) can be enabled in Supabase for production
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **403 Forbidden on InfinityFree**: Free hosting may block PUT/DELETE methods. The code uses POST with action parameters as a workaround.
+1. **"Table not found" errors**: Make sure you've run the SQL schema in Supabase
+2. **CORS errors**: Check that `ALLOWED_ORIGIN` is set correctly in Vercel
+3. **Authentication fails**: Verify Supabase credentials are correct in environment variables
+4. **Image upload fails**: Check Cloudinary credentials in `js/cloudinary.js`
+5. **High Edge Requests**: The system uses caching to minimize API calls. Check polling intervals if needed.
 
-2. **CORS Errors**: Ensure your domain is in the `$allowedOrigins` array in `api/config.php`.
+### Vercel Deployment Issues
 
-3. **Firebase Connection Issues**: Verify your API key and project ID are correct.
+- **Build fails**: Ensure Node.js version is set to 22.x in `package.json`
+- **Function errors**: Check Vercel function logs in the dashboard
+- **Environment variables**: Verify all required variables are set in Vercel project settings
 
-4. **Image Upload Fails**: Check Cloudinary credentials and upload preset configuration.
+## 📊 Database Schema
 
-See `docs/FREE_HOSTING_ISSUES.md` for more troubleshooting tips.
+The system uses the following Supabase tables:
+
+- **admins**: `id` (TEXT PRIMARY KEY), `password` (TEXT)
+- **borrowers**: `id` (TEXT PRIMARY KEY), `password`, `name`, `email`, `course`, `year_level`, `status`
+- **equipments**: `id` (TEXT PRIMARY KEY), `name`, `category`, `status`, `condition`, `location`, `barcode`, `image_url`
+- **requests**: `id` (TEXT PRIMARY KEY), `borrower_id`, `equipment_id`, `status`, `purpose`, `review` (JSONB), etc.
+- **equipment_history**: `id`, `equipment_id`, `borrower_id`, `action`, `timestamp`
+- **notifications**: `id`, `user_id`, `type`, `data` (JSONB), `read`, `timestamp`
+- **activity_logs**: `id`, `action`, `user_id`, `user_role`, `details` (JSONB), `timestamp`
 
 ## 🤝 Contributing
 
@@ -199,9 +246,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🙏 Acknowledgments
 
 - Bootstrap for UI components
-- Firebase for database services
+- Supabase for database services
 - Cloudinary for image storage
-- InfinityFree for hosting compatibility considerations
+- Vercel for hosting and serverless functions
 
 ## 📞 Support
 
@@ -209,6 +256,6 @@ For issues and questions, please open an issue on GitHub.
 
 ---
 
-**Note**: This project was designed to work with free hosting services like InfinityFree, which may have limitations on HTTP methods and execution time.
+**Live Demo**: [View on Vercel](https://ebulodccis-test2.vercel.app)
 
-
+**Repository**: [GitHub](https://github.com/majingamo/ebulodccis)
