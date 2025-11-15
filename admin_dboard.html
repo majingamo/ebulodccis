@@ -2518,6 +2518,7 @@
                 <tr><th>Request Date:</th><td>${requestDate} ${request.startTime && request.endTime ? `<br><small class="text-muted"><i class="bi bi-clock"></i> ${formatTime(request.startTime)} - ${formatTime(request.endTime)}</small>` : ''}</td></tr>
                 <tr><th>Return Date:</th><td>${getReturnDate(request)} ${request.returnedAt ? `<br><small class="text-muted"><i class="bi bi-clock-history"></i> Returned: ${formatTimeOnly(request.returnedAt)}</small>` : ''}</td></tr>
                 <tr><th>Purpose:</th><td>${escapeHtml(request.purpose || 'N/A')}</td></tr>
+                ${request.status?.toLowerCase().includes('returned') && request.reviewed && request.review?.comment ? `<tr><th>Borrower Feedback:</th><td>${escapeHtml(request.review.comment)}</td></tr>` : ''}
                 ${request.adminComment ? `<tr><th>Admin Comment:</th><td>${escapeHtml(request.adminComment)}</td></tr>` : ''}
                 ${request.status?.toLowerCase().includes('cancelled') && request.cancellationComment ? `<tr><th>Cancellation Reason:</th><td>${escapeHtml(request.cancellationComment)}</td></tr>` : ''}
                 ${request.status?.toLowerCase().includes('cancelled') && request.cancelledAt ? `<tr><th>Cancelled At:</th><td>${new Date(request.cancelledAt).toLocaleString()}</td></tr>` : ''}

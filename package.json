@@ -1,0 +1,16 @@
+{
+  "name": "ebulod",
+  "version": "1.0.0",
+  "description": "E-Bulod Equipment Borrowing System",
+  "scripts": {
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "18.x"
+  }
+}
+

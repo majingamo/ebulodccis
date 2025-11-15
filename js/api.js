@@ -3,7 +3,10 @@
  * Handles all API communication
  */
 
-const API_BASE = 'api/';
+// API Base URL - works for both local and Vercel deployment
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+  ? 'api/' 
+  : '/api/';
 
 async function apiRequest(endpoint, options = {}) {
   try {
@@ -89,15 +92,24 @@ async function apiRequest(endpoint, options = {}) {
     const contentType = response.headers.get('content-type');
     let data;
     
+    // Clone the response so we can read it multiple times if needed
+    const responseClone = response.clone();
+    
     if (contentType && contentType.includes('application/json')) {
       try {
         data = await response.json();
       } catch (jsonError) {
-        // If JSON parsing fails, get text response for debugging
-        const text = await response.text();
-        console.error('JSON parse error:', jsonError);
-        console.error('Response text:', text.substring(0, 500));
-        throw new Error(`Invalid JSON response: ${text.substring(0, 200)}`);
+        // If JSON parsing fails, get text response from the clone for debugging
+        try {
+          const text = await responseClone.text();
+          console.error('JSON parse error:', jsonError);
+          console.error('Response text:', text.substring(0, 500));
+          throw new Error(`Invalid JSON response: ${text.substring(0, 200)}`);
+        } catch (textError) {
+          // If we can't read text either, just throw the original JSON error
+          console.error('JSON parse error:', jsonError);
+          throw new Error(`Invalid JSON response: ${jsonError.message}`);
+        }
       }
     } else {
       // If not JSON, get text response for debugging

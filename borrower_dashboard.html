@@ -347,27 +347,6 @@
       font-weight: var(--font-weight-medium);
     }
 
-    /* Rating Stars */
-    .rating-stars {
-      display: flex;
-      gap: 8px;
-      font-size: 2rem;
-      color: #e5e7eb;
-      cursor: pointer;
-    }
-
-    .rating-star {
-      transition: all 0.2s ease;
-    }
-
-    .rating-star:hover,
-    .rating-star.active {
-      color: #fbbf24;
-    }
-
-    .rating-star.filled {
-      color: #fbbf24;
-    }
 
     /* Analytics Cards */
     .analytics-card {
@@ -1137,7 +1116,7 @@
       <div class="modal-content">
         <form id="reviewForm">
           <div class="modal-header">
-            <h5 class="modal-title">Rate Equipment</h5>
+            <h5 class="modal-title">Equipment Feedback</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
@@ -1151,26 +1130,14 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Rating <span class="text-danger">*</span></label>
-              <div class="rating-stars mb-2" id="ratingStars">
-                <i class="bi bi-star rating-star" data-rating="1"></i>
-                <i class="bi bi-star rating-star" data-rating="2"></i>
-                <i class="bi bi-star rating-star" data-rating="3"></i>
-                <i class="bi bi-star rating-star" data-rating="4"></i>
-                <i class="bi bi-star rating-star" data-rating="5"></i>
-              </div>
-              <small class="text-muted">Click on a star to rate (1-5 stars)</small>
-              <input type="hidden" id="reviewRating" required>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Comment</label>
-              <textarea class="form-control" id="reviewComment" rows="4" placeholder="Share your experience with this equipment (optional)"></textarea>
+              <label class="form-label">Feedback <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="reviewComment" rows="4" placeholder="Share your experience with this equipment..." required></textarea>
+              <small class="text-muted">Please provide your feedback about this equipment.</small>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary">Submit Review</button>
+            <button type="submit" class="btn btn-primary">Submit Feedback</button>
           </div>
         </form>
       </div>
@@ -1191,7 +1158,7 @@
   </div>
 
   <!-- API Client -->
-  <script src="js/api.js?v=2.0"></script>
+  <script src="js/api.js?v=2.7"></script>
   <!-- Bootstrap -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -1934,14 +1901,14 @@
                     data-request-id="${req.id}" 
                     data-equipment-id="${escapeHtml(req.equipmentId || '')}" 
                     data-equipment-name="${escapeHtml(req.equipmentName || 'Unknown Equipment')}">
-              <i class="bi bi-star"></i> Rate Equipment
+              <i class="bi bi-chat-left-text"></i> Leave Feedback
             </button>
           ` : '';
           
           // Show review info if already reviewed
           const reviewInfo = req.reviewed && req.review ? `
             <div class="alert alert-success mt-2 mb-0">
-              <small><strong>Your Review:</strong> ${'★'.repeat(req.review.rating || 0)}${'☆'.repeat(5 - (req.review.rating || 0))} ${req.review.comment ? '- ' + escapeHtml(req.review.comment) : ''}</small>
+              <small><strong>Your Feedback:</strong> ${req.review.comment ? escapeHtml(req.review.comment) : 'No feedback provided'}</small>
             </div>
           ` : '';
           
@@ -2284,68 +2251,12 @@
       document.getElementById("reviewEquipmentId").value = equipmentId;
       document.getElementById("reviewEquipmentName").value = equipmentName;
       document.getElementById("reviewEquipmentDisplay").value = equipmentName;
-      document.getElementById("reviewRating").value = '';
       document.getElementById("reviewComment").value = '';
-      
-      // Reset stars
-      document.querySelectorAll('.rating-star').forEach(star => {
-        star.classList.remove('filled', 'active');
-        star.classList.add('bi-star');
-        star.classList.remove('bi-star-fill');
-      });
       
       const modal = new bootstrap.Modal(document.getElementById("reviewModal"));
       modal.show();
     }
 
-    // Rating Stars Interaction
-    document.addEventListener('DOMContentLoaded', function() {
-      const ratingStars = document.getElementById('ratingStars');
-      if (ratingStars) {
-        const stars = ratingStars.querySelectorAll('.rating-star');
-        let selectedRating = 0;
-
-        stars.forEach((star, index) => {
-          star.addEventListener('click', function() {
-            selectedRating = parseInt(this.getAttribute('data-rating'));
-            document.getElementById('reviewRating').value = selectedRating;
-            
-            stars.forEach((s, i) => {
-              if (i < selectedRating) {
-                s.classList.add('filled', 'active');
-                s.classList.remove('bi-star');
-                s.classList.add('bi-star-fill');
-              } else {
-                s.classList.remove('filled', 'active');
-                s.classList.add('bi-star');
-                s.classList.remove('bi-star-fill');
-              }
-            });
-          });
-
-          star.addEventListener('mouseenter', function() {
-            const hoverRating = parseInt(this.getAttribute('data-rating'));
-            stars.forEach((s, i) => {
-              if (i < hoverRating) {
-                s.classList.add('active');
-              } else {
-                s.classList.remove('active');
-              }
-            });
-          });
-        });
-
-        ratingStars.addEventListener('mouseleave', function() {
-          stars.forEach((s, i) => {
-            if (i < selectedRating) {
-              s.classList.add('active');
-            } else {
-              s.classList.remove('active');
-            }
-          });
-        });
-      }
-    });
 
     // Review Form Submission
     document.getElementById("reviewForm").addEventListener("submit", async (e) => {
@@ -2353,24 +2264,22 @@
 
       const requestId = document.getElementById("reviewRequestId").value;
       const equipmentId = document.getElementById("reviewEquipmentId").value;
-      const rating = parseInt(document.getElementById("reviewRating").value);
       const comment = document.getElementById("reviewComment").value.trim();
 
-      if (!rating || rating < 1 || rating > 5) {
-        showAlert("Please select a rating (1-5 stars).", "warning");
+      if (!comment) {
+        showAlert("Please provide your feedback.", "warning");
         return;
       }
 
       try {
         // Submit review via API
         const result = await RequestsAPI.submitReview(requestId, {
-          rating: rating,
           comment: comment,
           equipmentId: equipmentId,
           timestamp: new Date().toISOString()
         });
 
-        showAlert("Review submitted successfully!", "success");
+        showAlert("Feedback submitted successfully!", "success");
         
         const modal = bootstrap.Modal.getInstance(document.getElementById("reviewModal"));
         modal.hide();
@@ -2381,15 +2290,13 @@
         clearCache('requests');
         await loadMyRequests();
       } catch (error) {
-        console.error("Error submitting review:", error);
-        let errorMessage = "Error submitting review. Please try again.";
+        console.error("Error submitting feedback:", error);
+        let errorMessage = "Error submitting feedback. Please try again.";
         if (error.message) {
           errorMessage = error.message;
-          // If it's a JSON parse error, show a more user-friendly message
-          if (error.message.includes('JSON') || error.message.includes('Unexpected token')) {
-            errorMessage = "Server error occurred. Please try again later.";
-          }
         }
+        // Log full error for debugging
+        console.error("Full error details:", error);
         showAlert(errorMessage, "danger");
       }
     });
