@@ -138,17 +138,17 @@ async function apiRequest(endpoint, options = {}) {
 // Equipment API
 const EquipmentAPI = {
   async getAll() {
-    const response = await apiRequest('equipment.php');
+    const response = await apiRequest('equipment');
     return response.data;
   },
   
   async getById(id) {
-    const response = await apiRequest(`equipment.php?id=${id}`);
+    const response = await apiRequest(`equipment?id=${id}`);
     return response.data;
   },
   
   async create(data) {
-    const response = await apiRequest('equipment.php', {
+    const response = await apiRequest('equipment', {
       method: 'POST',
       body: JSON.stringify(data)
     });
@@ -157,7 +157,7 @@ const EquipmentAPI = {
   
   async update(id, data) {
     // Use POST with action=update instead of PUT (InfinityFree blocks PUT on free plans)
-    const response = await apiRequest('equipment.php', {
+    const response = await apiRequest('equipment', {
       method: 'POST',
       body: JSON.stringify({ id, action: 'update', ...data })
     });
@@ -166,7 +166,7 @@ const EquipmentAPI = {
   
   async delete(id) {
     // Use POST with action=delete instead of DELETE (InfinityFree blocks DELETE on free plans)
-    const response = await apiRequest('equipment.php', {
+    const response = await apiRequest('equipment', {
       method: 'POST',
       body: JSON.stringify({ id, action: 'delete' })
     });
@@ -182,18 +182,18 @@ const RequestsAPI = {
     if (filters.status) params.append('status', filters.status);
     
     const queryString = params.toString();
-    const url = queryString ? `requests.php?${queryString}` : 'requests.php';
+    const url = queryString ? `requests?${queryString}` : 'requests';
     const response = await apiRequest(url);
     return response.data;
   },
   
   async getById(id) {
-    const response = await apiRequest(`requests.php?id=${id}`);
+    const response = await apiRequest(`requests?id=${id}`);
     return response.data;
   },
   
   async create(data) {
-    const response = await apiRequest('requests.php', {
+    const response = await apiRequest('requests', {
       method: 'POST',
       body: JSON.stringify(data)
     });
@@ -203,7 +203,7 @@ const RequestsAPI = {
   async approve(id, adminComment = null) {
     // Use POST instead of PUT (InfinityFree blocks PUT/DELETE on free plans)
     console.log('[API] Approve request:', { id, adminComment, method: 'POST' });
-    const response = await apiRequest('requests.php', {
+    const response = await apiRequest('requests', {
       method: 'POST',
       body: JSON.stringify({ id, action: 'approve', adminComment })
     });
@@ -212,7 +212,7 @@ const RequestsAPI = {
   
   async reject(id, adminComment = null) {
     // Use POST instead of PUT
-    const response = await apiRequest('requests.php', {
+    const response = await apiRequest('requests', {
       method: 'POST',
       body: JSON.stringify({ id, action: 'reject', adminComment })
     });
@@ -221,7 +221,7 @@ const RequestsAPI = {
   
   async return(id, returnCondition, returnNotes = null) {
     // Use POST instead of PUT
-    const response = await apiRequest('requests.php', {
+    const response = await apiRequest('requests', {
       method: 'POST',
       body: JSON.stringify({ id, action: 'return', returnCondition, returnNotes })
     });
@@ -230,7 +230,7 @@ const RequestsAPI = {
   
   async cancel(id, cancellationComment) {
     // Use POST instead of PUT
-    const response = await apiRequest('requests.php', {
+    const response = await apiRequest('requests', {
       method: 'POST',
       body: JSON.stringify({ id, action: 'cancel', cancellationComment })
     });
@@ -239,7 +239,7 @@ const RequestsAPI = {
   
   async submitReview(id, reviewData) {
     // Submit review for a returned request
-    const response = await apiRequest('requests.php', {
+    const response = await apiRequest('requests', {
       method: 'POST',
       body: JSON.stringify({ id, action: 'review', review: reviewData })
     });
@@ -250,17 +250,17 @@ const RequestsAPI = {
 // Dashboard API
 const DashboardAPI = {
   async getStats() {
-    const response = await apiRequest('dashboard.php?type=stats');
+    const response = await apiRequest('dashboard?type=stats');
     return response.data;
   },
   
   async getRecentActivity() {
-    const response = await apiRequest('dashboard.php?type=recent_activity');
+    const response = await apiRequest('dashboard?type=recent_activity');
     return response.data;
   },
   
   async getChartData() {
-    const response = await apiRequest('dashboard.php?type=chart_data');
+    const response = await apiRequest('dashboard?type=chart_data');
     return response.data;
   }
 };
@@ -268,13 +268,13 @@ const DashboardAPI = {
 // Borrowers API
 const BorrowersAPI = {
   async getAll(search = null) {
-    const url = search ? `borrowers.php?search=${encodeURIComponent(search)}` : 'borrowers.php';
+    const url = search ? `borrowers?search=${encodeURIComponent(search)}` : 'borrowers';
     const response = await apiRequest(url);
     return response.data;
   },
   
   async getById(id) {
-    const response = await apiRequest(`borrowers.php?id=${id}`);
+    const response = await apiRequest(`borrowers?id=${id}`);
     return response.data;
   }
 };
@@ -282,13 +282,13 @@ const BorrowersAPI = {
 // Notifications API
 const NotificationsAPI = {
   async getAll() {
-    const response = await apiRequest('notifications.php');
+    const response = await apiRequest('notifications');
     return response.data;
   },
   
   async markAsRead(id) {
     // Use POST with action instead of PUT (InfinityFree blocks PUT)
-    const response = await apiRequest('notifications.php', {
+    const response = await apiRequest('notifications', {
       method: 'POST',
       body: JSON.stringify({ id, action: 'mark_read' })
     });
@@ -297,7 +297,7 @@ const NotificationsAPI = {
   
   async markAllAsRead() {
     // Use POST with action instead of PUT
-    const response = await apiRequest('notifications.php', {
+    const response = await apiRequest('notifications', {
       method: 'POST',
       body: JSON.stringify({ action: 'mark_all_read' })
     });
@@ -308,7 +308,7 @@ const NotificationsAPI = {
 // History API
 const HistoryAPI = {
   async getEquipmentHistory(equipmentId) {
-    const response = await apiRequest(`history.php?equipmentId=${equipmentId}`);
+    const response = await apiRequest(`history?equipmentId=${equipmentId}`);
     return response.data;
   }
 };
@@ -316,7 +316,7 @@ const HistoryAPI = {
 // Auth API
 const AuthAPI = {
   async login(userId, password) {
-    const response = await apiRequest('auth.php', {
+    const response = await apiRequest('auth', {
       method: 'POST',
       body: JSON.stringify({ userId, password })
     });
@@ -324,12 +324,12 @@ const AuthAPI = {
   },
   
   async checkAuth() {
-    const response = await apiRequest('auth.php');
+    const response = await apiRequest('auth');
     return response.data;
   },
   
   async logout() {
-    await apiRequest('auth.php', { method: 'DELETE' });
+    await apiRequest('auth', { method: 'DELETE' });
   }
 };
 
@@ -337,7 +337,7 @@ const AuthAPI = {
 const ExportAPI = {
   async exportData(type, format = 'csv', filters = {}) {
     // Use POST method with filters in body for better compatibility
-    const response = await fetch(API_BASE + 'export.php', {
+    const response = await fetch(API_BASE + 'export', {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -382,7 +382,7 @@ const ExportAPI = {
 // Bulk Operations API
 const BulkOperationsAPI = {
   async bulkUpdateEquipmentStatus(ids, status) {
-    const response = await apiRequest('bulk_operations.php', {
+    const response = await apiRequest('bulk_operations', {
       method: 'POST',
       body: JSON.stringify({
         operation: 'update_equipment_status',
@@ -394,7 +394,7 @@ const BulkOperationsAPI = {
   },
   
   async bulkUpdateEquipmentCondition(ids, condition) {
-    const response = await apiRequest('bulk_operations.php', {
+    const response = await apiRequest('bulk_operations', {
       method: 'POST',
       body: JSON.stringify({
         operation: 'update_equipment_condition',
@@ -406,7 +406,7 @@ const BulkOperationsAPI = {
   },
   
   async bulkApproveRequests(ids) {
-    const response = await apiRequest('bulk_operations.php', {
+    const response = await apiRequest('bulk_operations', {
       method: 'POST',
       body: JSON.stringify({
         operation: 'approve_requests',
@@ -417,7 +417,7 @@ const BulkOperationsAPI = {
   },
   
   async bulkRejectRequests(ids, adminComment = 'Bulk rejection') {
-    const response = await apiRequest('bulk_operations.php', {
+    const response = await apiRequest('bulk_operations', {
       method: 'POST',
       body: JSON.stringify({
         operation: 'reject_requests',
@@ -429,7 +429,7 @@ const BulkOperationsAPI = {
   },
   
   async bulkDeleteEquipment(ids) {
-    const response = await apiRequest('bulk_operations.php', {
+    const response = await apiRequest('bulk_operations', {
       method: 'POST',
       body: JSON.stringify({
         operation: 'delete_equipment',

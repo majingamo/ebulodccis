@@ -1,22 +1,6 @@
-// js/auth_unified.js - Unified authentication that checks both admins and borrowers
+// js/auth_unified.js - Unified authentication using API
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ✅ Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyB-I8YDtDaGJ--uIw5ppePzxutvdnHYCYg",
-    authDomain: "studio-5277928304-db252.firebaseapp.com",
-    projectId: "studio-5277928304-db252",
-    storageBucket: "studio-5277928304-db252.firebasestorage.app",
-    messagingSenderId: "489996060233",
-    appId: "1:489996060233:web:e088e281498e8499952198",
-  };
-
-  // ✅ Initialize Firebase (only once)
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-
-  const db = firebase.firestore();
   const form = document.getElementById("loginForm");
 
   // Helper function to show error message
@@ -51,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     studentIdInput.addEventListener("input", hideError);
   }
 
-  // ✅ Form submit handler
+  // Form submit handler
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     hideError(); // Clear any previous errors
@@ -65,54 +49,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      console.log("🔍 Checking Firestore for:", studentId);
+      console.log("🔍 Attempting login for:", studentId);
 
-      // Check admin collection first
-      const adminDocRef = db.collection("admins").doc(studentId);
-      const adminDoc = await adminDocRef.get();
+      // Use API endpoint for authentication
+      const response = await fetch('api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: studentId,
+          password: password
+        })
+      });
 
-      if (adminDoc.exists) {
-        const adminData = adminDoc.data();
-        console.log("✅ Found admin account:", adminData);
+      const data = await response.json();
 
-        if (adminData.password === password) {
+      if (data.success) {
+        console.log("✅ Login successful:", data.data);
+        
+        // Store user info
+        if (data.data.role === 'admin') {
           localStorage.setItem("adminId", studentId);
           localStorage.setItem("userRole", "admin");
           console.log("➡ Redirecting to admin dashboard...");
-          window.location.href = "admin_dboard.html";
-          return;
-        } else {
-          showError("Incorrect password.");
-          return;
-        }
-      }
-
-      // If not found in admins, check borrowers collection
-      const borrowerDocRef = db.collection("borrowers").doc(studentId);
-      const borrowerDoc = await borrowerDocRef.get();
-
-      if (borrowerDoc.exists) {
-        const borrowerData = borrowerDoc.data();
-        console.log("✅ Found borrower account:", borrowerData);
-
-        if (borrowerData.password === password) {
+          window.location.href = data.data.redirect || "admin_dboard.html";
+        } else if (data.data.role === 'borrower') {
           localStorage.setItem("borrowerId", studentId);
           localStorage.setItem("userRole", "borrower");
           console.log("➡ Redirecting to borrower dashboard...");
-          window.location.href = "borrower_dashboard.html";
-          return;
-        } else {
-          showError("Incorrect password.");
-          return;
+          window.location.href = data.data.redirect || "borrower_dashboard.html";
         }
+      } else {
+        showError(data.error || "Login failed. Please check your credentials.");
       }
-
-      // If not found in either collection
-      showError("No account found for this Username.");
     } catch (error) {
       console.error("❌ Login error:", error);
       showError("An error occurred during login. Please try again.");
     }
   });
 });
-

@@ -1,27 +1,11 @@
-// js/auth_borrower.js - Borrower authentication (for backward compatibility)
+// js/auth_borrower.js - Borrower authentication using API
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ✅ Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyB-I8YDtDaGJ--uIw5ppePzxutvdnHYCYg",
-    authDomain: "studio-5277928304-db252.firebaseapp.com",
-    projectId: "studio-5277928304-db252",
-    storageBucket: "studio-5277928304-db252.firebasestorage.app",
-    messagingSenderId: "489996060233",
-    appId: "1:489996060233:web:e088e281498e8499952198",
-  };
-
-  // ✅ Initialize Firebase (only once)
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-
-  const db = firebase.firestore();
   const form = document.getElementById("borrowerLoginForm");
 
   if (!form) return; // Exit if form doesn't exist
 
-  // ✅ Form submit handler
+  // Form submit handler
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -40,27 +24,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      console.log("🔍 Checking Firestore for borrower:", borrowerId);
+      console.log("🔍 Attempting borrower login for:", borrowerId);
 
-      const docRef = db.collection("borrowers").doc(borrowerId);
-      const doc = await docRef.get();
+      // Use API endpoint for authentication
+      const response = await fetch('api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: borrowerId,
+          password: password
+        })
+      });
 
-      if (!doc.exists) {
-        alert("No account found for this Student ID.");
-        return;
-      }
+      const data = await response.json();
 
-      const userData = doc.data();
-      console.log("✅ Found borrower account:", userData);
-
-      if (userData.password === password) {
+      if (data.success && data.data.role === 'borrower') {
+        console.log("✅ Borrower login successful");
         localStorage.setItem("borrowerId", borrowerId);
         localStorage.setItem("userRole", "borrower");
         alert("Login successful!");
         console.log("➡ Redirecting to borrower dashboard...");
-        window.location.href = "borrower_dashboard.html";
+        window.location.href = data.data.redirect || "borrower_dashboard.html";
       } else {
-        alert("Incorrect password.");
+        alert(data.error || "Invalid credentials. Please check your Student ID and Password.");
       }
     } catch (error) {
       console.error("❌ Login error:", error);
@@ -68,4 +56,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-

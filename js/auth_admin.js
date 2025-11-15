@@ -1,25 +1,9 @@
-// js/auth_admin.js
+// js/auth_admin.js - Admin authentication using API
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ✅ Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyB-I8YDtDaGJ--uIw5ppePzxutvdnHYCYg",
-    authDomain: "studio-5277928304-db252.firebaseapp.com",
-    projectId: "studio-5277928304-db252",
-    storageBucket: "studio-5277928304-db252.firebasestorage.app",
-    messagingSenderId: "489996060233",
-    appId: "1:489996060233:web:e088e281498e8499952198",
-  };
-
-  // ✅ Initialize Firebase (only once)
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-
-  const db = firebase.firestore();
   const form = document.getElementById("adminLoginForm");
 
-  // ✅ Form submit handler
+  // Form submit handler
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -32,26 +16,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      console.log("🔍 Checking Firestore for:", adminId);
+      console.log("🔍 Attempting admin login for:", adminId);
 
-      const docRef = db.collection("admins").doc(adminId);
-      const doc = await docRef.get();
+      // Use API endpoint for authentication
+      const response = await fetch('api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: adminId,
+          password: password
+        })
+      });
 
-      if (!doc.exists) {
-        alert("No account found for this Admin ID.");
-        return;
-      }
+      const data = await response.json();
 
-      const userData = doc.data();
-      console.log("✅ Found account:", userData);
-
-      if (userData.password === password) {
+      if (data.success && data.data.role === 'admin') {
+        console.log("✅ Admin login successful");
         localStorage.setItem("adminId", adminId);
+        localStorage.setItem("userRole", "admin");
         alert("Login successful!");
         console.log("➡ Redirecting to dashboard...");
-        window.location.href = "admin_dboard.html"; // 👈 make sure file name matches
+        window.location.href = data.data.redirect || "admin_dboard.html";
       } else {
-        alert("Incorrect password.");
+        alert(data.error || "Invalid credentials. Please check your Admin ID and Password.");
       }
     } catch (error) {
       console.error("❌ Login error:", error);
