@@ -979,6 +979,7 @@
                 <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Email</th>
                 <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Course</th>
                 <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Year Level</th>
+                <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Trust Points</th>
                 <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Total Requests</th>
                 <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Actions</th>
               </tr>
@@ -2917,7 +2918,7 @@
       if (!borrowersTableBody) return;
       
       if (filteredBorrowers.length === 0) {
-        borrowersTableBody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="empty-state"><i class="bi bi-people"></i><p>No borrowers found</p></div></td></tr>';
+        borrowersTableBody.innerHTML = '<tr><td colspan="8" class="text-center"><div class="empty-state"><i class="bi bi-people"></i><p>No borrowers found</p></div></td></tr>';
         return;
       }
 
@@ -2940,6 +2941,14 @@
             </td>
             <td style="padding: 16px; color: #475569;">
               <span class="badge bg-light text-dark" style="font-weight: 500; padding: 6px 12px; border-radius: 6px;">${escapeHtml(borrower.yearLevel || 'N/A')}</span>
+            </td>
+            <td style="padding: 16px;">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width: 40px; height: 40px; border-radius: 8px; background: ${(borrower.trustPoints || borrower.trust_points || 20) <= 0 ? 'linear-gradient(135deg, #ef4444, #dc2626)' : (borrower.trustPoints || borrower.trust_points || 20) < 10 ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #8b5cf6, #7c3aed)'}; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 600;">
+                  ${borrower.trustPoints || borrower.trust_points || 20}
+                </div>
+                ${(borrower.trustPoints || borrower.trust_points || 20) <= 0 ? '<span class="badge bg-danger" style="font-size: 11px;">Cannot Borrow</span>' : ''}
+              </div>
             </td>
             <td style="padding: 16px;">
               <div class="d-flex align-items-center gap-2">
@@ -2985,6 +2994,13 @@
           requestsHtml += "</tbody></table>";
         }
 
+        const trustPoints = borrowerData.trustPoints || borrowerData.trust_points || 20;
+        const trustPointsBadge = trustPoints <= 0 
+          ? '<span class="badge bg-danger">Cannot Borrow</span>' 
+          : trustPoints < 10 
+          ? '<span class="badge bg-warning">Low</span>' 
+          : '<span class="badge bg-success">Good</span>';
+        
         const html = `
           <div class="row">
             <div class="col-md-6">
@@ -2995,6 +3011,13 @@
                 <tr><th>Email:</th><td>${escapeHtml(borrowerData.email || 'N/A')}</td></tr>
                 <tr><th>Course:</th><td>${escapeHtml(borrowerData.course || 'N/A')}</td></tr>
                 <tr><th>Year Level:</th><td>${escapeHtml(borrowerData.yearLevel || 'N/A')}</td></tr>
+                <tr><th>Trust Points:</th><td>
+                  <div class="d-flex align-items-center gap-2">
+                    <strong style="font-size: 18px; color: ${trustPoints <= 0 ? '#ef4444' : trustPoints < 10 ? '#f59e0b' : '#10b981'};">${trustPoints}</strong>
+                    ${trustPointsBadge}
+                  </div>
+                  ${trustPoints <= 0 ? '<small class="text-danger d-block mt-1">Borrower cannot make new requests. Please visit Dean\'s office for appeal.</small>' : ''}
+                </td></tr>
               </table>
             </div>
             <div class="col-md-6">

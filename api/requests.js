@@ -15,7 +15,9 @@ const {
   getAuthenticatedUserId,
   getAuthenticatedUserRole,
   validateRequired,
-  logActivity
+  logActivity,
+  updateTrustPoints,
+  getTrustPoints
 } = require('./config.js');
 
 module.exports = async (req, res) => {
@@ -208,9 +210,10 @@ module.exports = async (req, res) => {
             
             validateRequired(data, ['returnCondition']);
             
+            const returnedAt = new Date();
             updateData = {
               status: 'returned',
-              returnedAt: new Date().toISOString(),
+              returnedAt: returnedAt.toISOString(),
               returnedBy: userId,
               returnCondition: data.returnCondition
             };
@@ -229,6 +232,56 @@ module.exports = async (req, res) => {
               equipmentUpdate.condition = 'Damaged';
             }
             
+            // Calculate trust points changes
+            let pointsChange = 0;
+            const pointsReasons = [];
+            
+            // Check if return is late (30-60 minutes or more after scheduled endTime)
+            if (request.returnDate && request.endTime) {
+              try {
+                // Combine returnDate and endTime to get scheduled return datetime
+                const scheduledReturnDate = new Date(request.returnDate);
+                const [hours, minutes] = request.endTime.split(':').map(Number);
+                scheduledReturnDate.setHours(hours, minutes, 0, 0);
+                
+                // Calculate difference in minutes
+                const diffMinutes = (returnedAt - scheduledReturnDate) / (1000 * 60);
+                
+                // If 30-60 minutes late or more, deduct 3 points
+                if (diffMinutes >= 30) {
+                  pointsChange -= 3;
+                  pointsReasons.push(`Late return (${Math.round(diffMinutes)} minutes late): -3 points`);
+                }
+              } catch (error) {
+                console.error('Error calculating return lateness:', error);
+              }
+            }
+            
+            // Condition-based points
+            if (data.returnCondition === 'Good') {
+              pointsChange += 1;
+              pointsReasons.push('Good condition on return: +1 point');
+            } else if (data.returnCondition === 'Damaged') {
+              pointsChange -= 5;
+              pointsReasons.push('Damaged condition on return: -5 points');
+            }
+            
+            // Update trust points if there's a change
+            if (pointsChange !== 0) {
+              try {
+                const newPoints = await updateTrustPoints(
+                  request.borrowerId,
+                  pointsChange,
+                  `Equipment return: ${pointsReasons.join(', ')}`
+                );
+                updateData.trustPointsChange = pointsChange;
+                updateData.newTrustPoints = newPoints;
+              } catch (error) {
+                console.error('Error updating trust points:', error);
+                // Continue with return even if trust points update fails
+              }
+            }
+            
             await updateDocument('equipments', request.equipmentId, equipmentUpdate);
             
             await createDocument('equipment_history', {
@@ -239,7 +292,8 @@ module.exports = async (req, res) => {
               action: 'returned',
               condition: data.returnCondition,
               notes: data.returnNotes || null,
-              timestamp: new Date().toISOString()
+              timestamp: returnedAt.toISOString(),
+              trustPointsChange: pointsChange || null
             });
             
             await createDocument('notifications', {
@@ -247,10 +301,12 @@ module.exports = async (req, res) => {
               type: 'equipment_returned',
               data: JSON.stringify({
                 equipmentName: request.equipmentName,
-                requestId: requestId
+                requestId: requestId,
+                trustPointsChange: pointsChange || 0,
+                newTrustPoints: updateData.newTrustPoints || null
               }),
               read: false,
-              timestamp: new Date().toISOString()
+              timestamp: returnedAt.toISOString()
             });
             
             await logActivity('return_equipment', {
@@ -259,7 +315,9 @@ module.exports = async (req, res) => {
               equipmentId: request.equipmentId,
               equipmentName: request.equipmentName,
               returnCondition: data.returnCondition,
-              returnNotes: data.returnNotes || ''
+              returnNotes: data.returnNotes || '',
+              trustPointsChange: pointsChange,
+              trustPointsReasons: pointsReasons
             }, userId);
             break;
             
@@ -320,6 +378,9 @@ module.exports = async (req, res) => {
               return;
             }
             
+            // Check if already reviewed to avoid duplicate points
+            const alreadyReviewed = request.reviewed === true;
+            
             const reviewData = data.review;
             updateData = {
               reviewed: true,
@@ -330,11 +391,28 @@ module.exports = async (req, res) => {
               }
             };
             
+            // Add 1 trust point for submitting feedback (only if not already reviewed)
+            if (!alreadyReviewed) {
+              try {
+                const newPoints = await updateTrustPoints(
+                  request.borrowerId,
+                  1,
+                  'Submitted equipment feedback'
+                );
+                updateData.trustPointsChange = 1;
+                updateData.newTrustPoints = newPoints;
+              } catch (error) {
+                console.error('Error updating trust points for feedback:', error);
+                // Continue with review even if trust points update fails
+              }
+            }
+            
             await logActivity('submit_review', {
               requestId: requestId,
               borrowerId: request.borrowerId,
               equipmentId: request.equipmentId,
-              equipmentName: request.equipmentName
+              equipmentName: request.equipmentName,
+              trustPointsChange: alreadyReviewed ? 0 : 1
             }, userId);
             break;
             
@@ -359,6 +437,17 @@ module.exports = async (req, res) => {
       
       // This is a new request creation
       validateRequired(data, ['borrowerId', 'equipmentId', 'equipmentName', 'purpose']);
+      
+      // Check if borrower has trust points (must be > 0 to borrow)
+      const trustPoints = await getTrustPoints(data.borrowerId);
+      if (trustPoints !== null && trustPoints <= 0) {
+        const response = sendError(
+          'You cannot borrow equipment because your trust points have reached 0. Please visit the Dean\'s office for an appeal.',
+          403
+        );
+        res.status(response.statusCode).json(JSON.parse(response.body));
+        return;
+      }
       
       const requestData = {
         borrowerId: data.borrowerId,
@@ -387,7 +476,8 @@ module.exports = async (req, res) => {
         borrowerId: requestData.borrowerId,
         equipmentId: requestData.equipmentId,
         equipmentName: requestData.equipmentName,
-        purpose: requestData.purpose
+        purpose: requestData.purpose,
+        trustPoints: trustPoints
       }, data.borrowerId);
       
       const response = sendSuccess({ id: docId }, 'Request created successfully');

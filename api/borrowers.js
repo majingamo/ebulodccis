@@ -8,8 +8,10 @@ const {
   sendError,
   getAllDocuments,
   getDocument,
+  createDocument,
   isAdmin,
-  getAuthenticatedUserId
+  getAuthenticatedUserId,
+  validateRequired
 } = require('./config.js');
 
 module.exports = async (req, res) => {
@@ -17,6 +19,54 @@ module.exports = async (req, res) => {
   setCORSHeaders(res);
   
   try {
+    if (req.method === 'POST') {
+      // Create new borrower
+      const adminCheck = await isAdmin(req);
+      if (!adminCheck) {
+        const response = sendError('Unauthorized: Admin access required', 403);
+        res.status(response.statusCode).json(JSON.parse(response.body));
+        return;
+      }
+      
+      const data = req.body || {};
+      validateRequired(data, ['id', 'password']);
+      
+      // Check if borrower already exists
+      const existingBorrower = await getDocument('borrowers', data.id);
+      if (existingBorrower) {
+        const response = sendError('Borrower account with this ID already exists', 400);
+        res.status(response.statusCode).json(JSON.parse(response.body));
+        return;
+      }
+      
+      // Create borrower with trust_points initialized to 20
+      const borrowerData = {
+        id: data.id,
+        password: data.password,
+        name: data.name || null,
+        email: data.email || null,
+        course: data.course || null,
+        yearLevel: data.yearLevel || null,
+        status: data.status || 'Active',
+        trustPoints: 20, // Initialize with 20 trust points
+        createdAt: new Date().toISOString(),
+        createdBy: getAuthenticatedUserId(req) || 'admin'
+      };
+      
+      // Remove null values
+      Object.keys(borrowerData).forEach(key => {
+        if (borrowerData[key] === null) {
+          delete borrowerData[key];
+        }
+      });
+      
+      await createDocument('borrowers', borrowerData);
+      
+      const response = sendSuccess({ id: data.id }, 'Borrower account created successfully');
+      res.status(response.statusCode).json(JSON.parse(response.body));
+      return;
+    }
+    
     if (req.method !== 'GET') {
       const response = sendError('Method not allowed', 405);
       res.status(response.statusCode).json(JSON.parse(response.body));

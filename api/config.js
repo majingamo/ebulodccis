@@ -274,6 +274,51 @@ function validateRequired(data, requiredFields) {
   }
 }
 
+// Update borrower trust points
+async function updateTrustPoints(borrowerId, pointsChange, reason = '') {
+  try {
+    const borrower = await getDocument('borrowers', borrowerId);
+    if (!borrower) {
+      throw new Error(`Borrower ${borrowerId} not found`);
+    }
+    
+    const currentPoints = borrower.trustPoints || borrower.trust_points || 20;
+    const newPoints = Math.max(0, currentPoints + pointsChange); // Ensure minimum is 0
+    
+    await updateDocument('borrowers', borrowerId, {
+      trustPoints: newPoints
+    });
+    
+    // Log the trust points change
+    await logActivity('update_trust_points', {
+      borrowerId: borrowerId,
+      previousPoints: currentPoints,
+      pointsChange: pointsChange,
+      newPoints: newPoints,
+      reason: reason
+    }, borrowerId, 'borrower');
+    
+    return newPoints;
+  } catch (error) {
+    console.error('Failed to update trust points:', error);
+    throw error;
+  }
+}
+
+// Get borrower trust points
+async function getTrustPoints(borrowerId) {
+  try {
+    const borrower = await getDocument('borrowers', borrowerId);
+    if (!borrower) {
+      return null;
+    }
+    return borrower.trustPoints || borrower.trust_points || 20;
+  } catch (error) {
+    console.error('Failed to get trust points:', error);
+    return null;
+  }
+}
+
 // Log activity
 async function logActivity(action, details = {}, userId = null, userRole = null) {
   try {
@@ -348,6 +393,8 @@ module.exports = {
   logActivity,
   getRequestBody,
   getSupabaseClient,
+  updateTrustPoints,
+  getTrustPoints,
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 };
