@@ -1,5 +1,5 @@
 /**
- * Requests API Endpoint (Node.js for Vercel)
+ * Requests API Endpoint (Node.js for Vercel with Supabase)
  * This is the main API for handling equipment borrowing requests
  */
 const {

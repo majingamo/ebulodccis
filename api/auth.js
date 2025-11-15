@@ -1,5 +1,5 @@
 /**
- * Authentication API Endpoint (Node.js for Vercel)
+ * Authentication API Endpoint (Node.js for Vercel with Supabase)
  */
 const {
   setCORSHeaders,
@@ -113,4 +113,3 @@ module.exports = async (req, res) => {
     res.status(response.statusCode).json(JSON.parse(response.body));
   }
 };
-

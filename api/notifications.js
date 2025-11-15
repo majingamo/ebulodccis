@@ -1,5 +1,5 @@
 /**
- * Notifications API Endpoint (Node.js for Vercel)
+ * Notifications API Endpoint (Node.js for Vercel with Supabase)
  */
 const {
   setCORSHeaders,

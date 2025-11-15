@@ -1,5 +1,5 @@
 /**
- * Export API Endpoint (Node.js for Vercel)
+ * Export API Endpoint (Node.js for Vercel with Supabase)
  */
 const {
   setCORSHeaders,

@@ -1,5 +1,5 @@
 /**
- * Borrowers API Endpoint (Node.js for Vercel)
+ * Borrowers API Endpoint (Node.js for Vercel with Supabase)
  */
 const {
   setCORSHeaders,

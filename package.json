@@ -6,7 +6,7 @@
     "build": "echo 'No build step required'"
   },
   "dependencies": {
-    "node-fetch": "^2.6.7"
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {},
   "engines": {

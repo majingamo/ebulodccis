@@ -1,5 +1,5 @@
 /**
- * Equipment History API Endpoint (Node.js for Vercel)
+ * Equipment History API Endpoint (Node.js for Vercel with Supabase)
  */
 const {
   setCORSHeaders,
