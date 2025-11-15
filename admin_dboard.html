@@ -2681,7 +2681,7 @@
           clearCache('requests');
           clearCache('stats');
           clearCache('equipment');
-          await loadRequests();
+          await loadRequests(true); // Force refresh
           await loadDashboardStats();
           await loadEquipments(true);
         } catch (error) {
