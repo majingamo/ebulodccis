@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
       return;
     }
     
-    const allHistory = await getAllDocuments('equipmentHistory');
+    const allHistory = await getAllDocuments('equipment_history');
     let history = allHistory.filter(item => item.equipmentId === equipmentId);
     
     history.sort((a, b) => {
