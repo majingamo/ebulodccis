@@ -41,7 +41,8 @@ function parseBody(req) {
   });
 }
 
-module.exports = async (req, res) => {
+// Vercel serverless function handler
+async function handler(req, res) {
   // Handle CORS
   if (handlePreflight(req, res)) return;
   setCORSHeaders(res);
@@ -51,8 +52,19 @@ module.exports = async (req, res) => {
     
     switch (method) {
       case 'POST': {
-        // Parse request body
-        const body = await parseBody(req);
+        // Vercel automatically parses JSON body
+        let body = {};
+        if (req.body) {
+          if (typeof req.body === 'string') {
+            try {
+              body = JSON.parse(req.body);
+            } catch (e) {
+              body = {};
+            }
+          } else {
+            body = req.body;
+          }
+        }
         const userId = sanitizeInput(body.userId || '');
         const password = sanitizeInput(body.password || '');
         
@@ -142,4 +154,7 @@ module.exports = async (req, res) => {
     const response = sendError('Server error: ' + error.message, 500);
     res.status(response.statusCode).json(JSON.parse(response.body));
   }
-};
+}
+
+// Export for Vercel
+module.exports = handler;
