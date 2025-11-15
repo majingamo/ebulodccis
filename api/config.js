@@ -23,9 +23,8 @@ function getSupabaseClient() {
 
 // CORS headers
 function setCORSHeaders(res) {
-  const origin = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : (process.env.ALLOWED_ORIGIN || '*');
+  // Get origin from request or environment
+  const origin = process.env.ALLOWED_ORIGIN || '*';
   
   res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
