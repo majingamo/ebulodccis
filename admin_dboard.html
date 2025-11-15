@@ -1212,6 +1212,39 @@
     
     // Notifications
     let notifications = [];
+    
+    // Performance: Cache for API responses to reduce Edge Requests
+    const apiCache = {
+      equipment: { data: null, timestamp: 0, ttl: 60000 }, // 1 minute
+      requests: { data: null, timestamp: 0, ttl: 30000 }, // 30 seconds
+      stats: { data: null, timestamp: 0, ttl: 30000 }, // 30 seconds
+      activity: { data: null, timestamp: 0, ttl: 60000 } // 1 minute
+    };
+    
+    // Get cached data or fetch new
+    async function getCachedData(cacheKey, fetchFn, ttl = 30000) {
+      const cache = apiCache[cacheKey];
+      const now = Date.now();
+      
+      if (cache && cache.data && (now - cache.timestamp) < ttl) {
+        return cache.data;
+      }
+      
+      const data = await fetchFn();
+      apiCache[cacheKey] = { data, timestamp: now, ttl };
+      return data;
+    }
+    
+    // Clear cache
+    function clearCache(cacheKey = null) {
+      if (cacheKey) {
+        apiCache[cacheKey] = { data: null, timestamp: 0, ttl: 0 };
+      } else {
+        Object.keys(apiCache).forEach(key => {
+          apiCache[key] = { data: null, timestamp: 0, ttl: 0 };
+        });
+      }
+    }
 
     // Session check - with delay to allow page to render first
     // This prevents immediate redirect in preview/file manager contexts
@@ -1397,7 +1430,8 @@
     // Load Dashboard Stats
     async function loadDashboardStats() {
       try {
-        const stats = await DashboardAPI.getStats();
+        // Use cache to reduce API calls
+        const stats = await getCachedData('stats', () => DashboardAPI.getStats(), 30000);
         
         document.getElementById("totalEquipment").textContent = stats.totalEquipment || 0;
         document.getElementById("availableEquipment").textContent = stats.availableEquipment || 0;
@@ -1413,7 +1447,8 @@
     async function loadRecentActivity() {
       const activityDiv = document.getElementById("recentActivity");
       try {
-        const activities = await DashboardAPI.getRecentActivity();
+        // Use cache to reduce API calls
+        const activities = await getCachedData('activity', () => DashboardAPI.getRecentActivity(), 60000);
 
         if (!activities || activities.length === 0) {
           activityDiv.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No recent activity</p></div>';
@@ -1479,15 +1514,19 @@
     }
 
     // Load Equipments
-    async function loadEquipments() {
+    async function loadEquipments(forceRefresh = false) {
       const tableBody = document.getElementById("equipmentTableBody");
       const loadingDiv = document.getElementById("equipmentLoading");
       
       loadingDiv.style.display = 'block';
       tableBody.innerHTML = '';
-
+      
       try {
-        allEquipment = await EquipmentAPI.getAll();
+        // Use cache to reduce API calls (unless force refresh)
+        if (forceRefresh) {
+          clearCache('equipment');
+        }
+        allEquipment = await getCachedData('equipment', () => EquipmentAPI.getAll(), 60000);
         filteredEquipment = [...allEquipment];
         loadingDiv.style.display = 'none';
         applyFilters();
@@ -1965,7 +2004,10 @@
         const modal = bootstrap.Modal.getInstance(document.getElementById("addEquipmentModal"));
         modal.hide();
 
-        await loadEquipments();
+        // Clear caches since data changed
+        clearCache('equipment');
+        clearCache('stats');
+        await loadEquipments(true);
         await loadDashboardStats();
       } catch (err) {
         console.error("Error saving:", err);
@@ -2048,7 +2090,10 @@
           }
           await EquipmentAPI.delete(id);
           showAlert("Equipment deleted successfully!", "success");
-        await loadEquipments();
+        // Clear caches since data changed
+        clearCache('equipment');
+        clearCache('stats');
+        await loadEquipments(true);
         await loadDashboardStats();
         } catch (error) {
           showAlert("Error deleting equipment", "danger");
@@ -2349,7 +2394,7 @@
     // ============================================
 
     // Load Requests
-    async function loadRequests() {
+    async function loadRequests(forceRefresh = false) {
       const requestsTableBody = document.getElementById("requestsTableBody");
       const requestsLoading = document.getElementById("requestsLoading");
       
@@ -2357,7 +2402,11 @@
       if (requestsTableBody) requestsTableBody.innerHTML = "";
 
       try {
-        allRequests = await RequestsAPI.getAll();
+        // Use cache to reduce API calls (unless force refresh)
+        if (forceRefresh) {
+          clearCache('requests');
+        }
+        allRequests = await getCachedData('requests', () => RequestsAPI.getAll(), 30000);
         
         // Sort by timestamp (newest first)
         allRequests.sort((a, b) => {
@@ -2587,9 +2636,16 @@
           }
           
           bootstrap.Modal.getInstance(document.getElementById("approveRejectModal")).hide();
-          await loadRequests();
-      await loadDashboardStats();
-      await loadEquipments();
+          
+          // Clear caches since data changed
+          clearCache('requests');
+          clearCache('stats');
+          clearCache('equipment');
+          
+          // Reload data (will use fresh API calls since cache is cleared)
+          await loadRequests(true); // Force refresh
+          await loadDashboardStats();
+          await loadEquipments(true); // Force refresh
           updatePendingRequestsBadge();
         } catch (error) {
           console.error("Error processing request:", error);
@@ -2621,9 +2677,13 @@
           await RequestsAPI.return(requestId, returnCondition, returnNotes);
           showAlert("Equipment returned successfully!", "success");
           bootstrap.Modal.getInstance(document.getElementById("returnEquipmentModal")).hide();
+          // Clear caches since data changed
+          clearCache('requests');
+          clearCache('stats');
+          clearCache('equipment');
           await loadRequests();
           await loadDashboardStats();
-          await loadEquipments();
+          await loadEquipments(true);
         } catch (error) {
           console.error("Error returning equipment:", error);
           showAlert("Error returning equipment", "danger");
@@ -2712,9 +2772,13 @@
           selectedRequestIds = [];
           batchApproveBtn.disabled = false;
           batchApproveBtn.innerHTML = '<i class="bi bi-check-circle"></i> Approve Selected';
-          await loadRequests();
+          // Clear caches since data changed
+          clearCache('requests');
+          clearCache('stats');
+          clearCache('equipment');
+          await loadRequests(true); // Force refresh
           await loadDashboardStats();
-          await loadEquipments();
+          await loadEquipments(true);
           updatePendingRequestsBadge();
         } catch (error) {
           console.error("Error batch approving requests:", error);
@@ -2755,7 +2819,10 @@
           selectedRequestIds = [];
           batchRejectBtn.disabled = false;
           batchRejectBtn.innerHTML = '<i class="bi bi-x-circle"></i> Reject Selected';
-          await loadRequests();
+          // Clear caches since data changed
+          clearCache('requests');
+          clearCache('stats');
+          await loadRequests(true); // Force refresh
           await loadDashboardStats();
           updatePendingRequestsBadge();
         } catch (error) {
@@ -3225,7 +3292,9 @@
         selectedEquipmentIds = [];
         if (selectAllEquipment) selectAllEquipment.checked = false;
         updateBulkActionsButton();
-        await loadEquipments();
+        // Clear cache since data changed
+        clearCache('equipment');
+        await loadEquipments(true);
       } catch (error) {
         console.error("Error updating equipment:", error);
         showAlert("Error updating equipment: " + error.message, "danger");
@@ -3243,7 +3312,9 @@
         selectedEquipmentIds = [];
         if (selectAllEquipment) selectAllEquipment.checked = false;
         updateBulkActionsButton();
-        await loadEquipments();
+        // Clear cache since data changed
+        clearCache('equipment');
+        await loadEquipments(true);
       } catch (error) {
         console.error("Error updating equipment:", error);
         showAlert("Error updating equipment: " + error.message, "danger");
@@ -3261,7 +3332,9 @@
         selectedEquipmentIds = [];
         if (selectAllEquipment) selectAllEquipment.checked = false;
         updateBulkActionsButton();
-        await loadEquipments();
+        // Clear cache since data changed
+        clearCache('equipment');
+        await loadEquipments(true);
       } catch (error) {
         console.error("Error deleting equipment:", error);
         showAlert("Error deleting equipment: " + error.message, "danger");
@@ -3319,18 +3392,20 @@
     
     // Initialize on page load
     window.addEventListener("load", async () => {
-      // Load requests for badge
+      // Load requests for badge (use cache)
       try {
-        allRequests = await RequestsAPI.getAll();
+        allRequests = await getCachedData('requests', () => RequestsAPI.getAll(), 30000);
         updatePendingRequestsBadge();
       } catch (error) {
         console.error("Error loading requests for badge:", error);
       }
       
-      // Set interval to update badge
+      // Set interval to update badge (with cache)
       setInterval(async () => {
         try {
-          allRequests = await RequestsAPI.getAll();
+          // Clear cache before fetching to get fresh data
+          clearCache('requests');
+          allRequests = await getCachedData('requests', () => RequestsAPI.getAll(), 30000);
           updatePendingRequestsBadge();
         } catch (error) {
           console.error("Error updating badge:", error);
