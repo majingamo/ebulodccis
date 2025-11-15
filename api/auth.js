@@ -11,6 +11,36 @@ const {
   sanitizeInput
 } = require('./config.js');
 
+// Helper to parse request body for Vercel
+function parseBody(req) {
+  return new Promise((resolve) => {
+    if (req.method === 'GET' || req.method === 'DELETE') {
+      resolve({});
+      return;
+    }
+    
+    // Vercel might already parse the body
+    if (req.body && typeof req.body === 'object') {
+      resolve(req.body);
+      return;
+    }
+    
+    // Otherwise, parse it manually
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch (e) {
+        resolve({});
+      }
+    });
+    req.on('error', () => resolve({}));
+  });
+}
+
 module.exports = async (req, res) => {
   // Handle CORS
   if (handlePreflight(req, res)) return;
@@ -21,10 +51,10 @@ module.exports = async (req, res) => {
     
     switch (method) {
       case 'POST': {
-        // Login
-        const data = req.body || {};
-        const userId = sanitizeInput(data.userId);
-        const password = sanitizeInput(data.password);
+        // Parse request body
+        const body = await parseBody(req);
+        const userId = sanitizeInput(body.userId || '');
+        const password = sanitizeInput(body.password || '');
         
         if (!userId || !password) {
           const response = sendError('userId and password are required', 400);
