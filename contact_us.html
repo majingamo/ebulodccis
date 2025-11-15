@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — CCIS E-Bulod</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       DESIGN SYSTEM - Centralized Design Tokens
+       ============================================ */
+    :root {
+      --color-primary: #002b5c;
+      --color-primary-dark: #001a3d;
+      --color-primary-light: #004080;
+      --color-secondary: #ffb400;
+      --color-bg-primary: #ffffff;
+      --color-text-primary: #1e293b;
+      --color-text-secondary: #64748b;
+      --font-family: 'Poppins', sans-serif;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 3rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition-base: 0.2s ease;
+    }
+    
+    body {
+      background: url("images/bg.jpg") no-repeat center center fixed;
+      background-size: cover;
+      font-family: var(--font-family);
+      color: var(--color-text-primary);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      background-color: var(--color-primary);
+      width: 100%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-sm) var(--spacing-2xl);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 65px;
+      box-shadow: var(--shadow-md);
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left img {
+      height: 45px;
+    }
+
+    .header-left h1 {
+      font-size: 1.2rem;
+      font-weight: var(--font-weight-semibold);
+      margin: 0;
+    }
+
+    /* Yellow line under header */
+    .yellow-accent {
+      background-color: var(--color-secondary);
+      height: 5px;
+      width: 100%;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      z-index: 99;
+    }
+
+    /* MAIN CONTENT */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 100px var(--spacing-xl) var(--spacing-2xl);
+    }
+
+    .contact-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: var(--spacing-lg) var(--spacing-2xl);
+      width: 100%;
+      max-width: 480px;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .contact-card h3 {
+      color: var(--color-primary);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .back-link {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: var(--transition-base);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+      color: var(--color-secondary);
+    }
+    
+    /* ============================================
+       BUTTON STYLES - Standardized
+       ============================================ */
+    .btn-primary {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+      transition: var(--transition-base);
+      font-weight: var(--font-weight-medium);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--color-primary-light);
+      border-color: var(--color-primary-light);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 600px) {
+      header {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        height: 65px;
+      }
+      .header-left img { height: 40px; }
+      .header-left h1 {
+        font-size: 1.1rem;
+        line-height: 1.2;
+        max-width: 220px;
+      }
+      .yellow-accent { top: 65px; }
+      main { padding: 110px var(--spacing-lg) var(--spacing-2xl); }
+      .contact-card {
+        padding: var(--spacing-xl);
+        border-radius: var(--radius-lg);
+      }
+      input, textarea { font-size: 16px; }
+      button.btn { padding: var(--spacing-md) var(--spacing-lg); }
+    }
+
+    /* FOOTER */
+    footer {
+      background: none !important;
+      box-shadow: none !important;
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      text-align: center;
+      padding: var(--spacing-sm) 0 var(--spacing-lg);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-height: 700px) {
+      main {
+        align-items: flex-start;
+        padding-top: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <img src="images/logo.png" alt="Department Logo" />
+      <h1>College of Computing and Information Sciences</h1>
+    </div>
+    <a href="index.html" class="text-white"><i class="bi bi-house-door"></i> Home</a>
+  </header>
+
+  <div class="yellow-accent"></div>
+
+  <main>
+    <div class="contact-card">
+      <h3><i class="bi bi-envelope-fill"></i> Contact Us</h3>
+      <p>If you have questions or concerns, please reach out to us:</p>
+      <ul class="list-unstyled mt-3">
+        <li><i class="bi bi-geo-alt-fill text-primary"></i> CCIS Department, Mariano Marcos State University</li>
+        <li><i class="bi bi-telephone-fill text-primary"></i> +63 999 999 9999</li>
+        <li><i class="bi bi-envelope text-primary"></i> ccis@mmsu.edu.ph</li>
+      </ul>
+
+      <hr>
+      <h5 class="mt-3">Or send us a message:</h5>
+      <form>
+        <div class="mb-3">
+          <label for="name" class="form-label">Your Name</label>
+          <input type="text" id="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Your Email</label>
+          <input type="email" id="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="message" class="form-label">Message</label>
+          <textarea id="message" rows="4" class="form-control" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Send Message</button>
+      </form>
+
+      <a href="index.html" class="d-block mt-4 back-link">
+        <i class="bi bi-arrow-left"></i> Back to Home
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 College of Computing and Information Sciences — CCIS E-Bulod System
+  </footer>
+</body>
+</html>

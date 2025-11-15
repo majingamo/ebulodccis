@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CCIS E-Bulod — Login</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    /* ============================================
+       DESIGN SYSTEM - Centralized Design Tokens
+       ============================================ */
+    :root {
+      --color-primary: #002b5c;
+      --color-primary-dark: #001a3d;
+      --color-primary-light: #004080;
+      --color-secondary: #ffb400;
+      --color-danger: #ef4444;
+      --color-bg-primary: #ffffff;
+      --color-text-primary: #1e293b;
+      --color-text-secondary: #64748b;
+      --font-size-sm: 0.875rem;
+      --spacing-xs: 0.25rem;
+      --font-family: 'Poppins', sans-serif;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 3rem;
+      --radius-md: 0.5rem;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.5rem;
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition-base: 0.2s ease;
+    }
+    
+    body {
+      background: url("images/bg.jpg") no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: var(--font-family);
+      margin: 0;
+    }
+
+    /* HEADER */
+    header {
+      background-color: var(--color-primary);
+      width: 100%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-sm) var(--spacing-2xl);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 65px;
+      box-sizing: border-box;
+      box-shadow: var(--shadow-md);
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left img {
+      height: 45px;
+    }
+
+    .header-left h1 {
+      font-size: 1.2rem;
+      font-weight: var(--font-weight-semibold);
+      margin: 0;
+    }
+
+    .header-right a {
+      color: white;
+      text-decoration: none;
+      font-weight: var(--font-weight-medium);
+      transition: var(--transition-base);
+    }
+
+    .header-right a:hover {
+      color: var(--color-secondary);
+      text-decoration: underline;
+    }
+
+    .yellow-accent {
+      background-color: var(--color-secondary);
+      height: 5px;
+      width: 100%;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      z-index: 101;
+      margin: 0;
+    }
+
+    /* MAIN CARD */
+    .main-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-lg);
+      padding: var(--spacing-2xl);
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      animation: fadeIn 0.8s ease;
+      margin-top: 120px;
+    }
+
+    .form-label {
+      font-weight: var(--font-weight-medium);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+      transition: var(--transition-base);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-primary-light);
+      border-color: var(--color-primary-light);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    h3 {
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      background: none !important;
+      box-shadow: none !important;
+      font-size: 0.85rem;
+      color: gray;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        height: 65px;
+        position: fixed; /* match contact page */
+        top: 0;
+        left: 0;
+        right: 0;
+      }
+      .header-left h1 {
+        font-size: 1.2rem; /* match contact page */
+        line-height: 1.2;
+      }
+      .header-right {
+        margin-top: 0;
+      }
+      .yellow-accent {
+        position: fixed; /* match contact page */
+        top: 65px;
+        left: 0;
+        right: 0;
+      }
+      .main-card {
+        margin-top: 100px; /* space below fixed header + accent */
+      }
+    }
+
+    /* Password Toggle */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      padding: 4px 8px;
+      z-index: 10;
+      transition: var(--transition-base);
+    }
+
+    .password-toggle:hover {
+      color: var(--color-primary);
+    }
+
+    .password-wrapper .form-control {
+      padding-right: 45px;
+    }
+
+    /* Prevent browser password reveal button from appearing */
+    .password-wrapper input[type="password"]::-webkit-credentials-auto-fill-button,
+    .password-wrapper input[type="password"]::-webkit-strong-password-auto-fill-button {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      position: absolute;
+      right: -9999px;
+    }
+
+    /* Hide any duplicate icons */
+    .password-wrapper .password-toggle i:not(:first-of-type) {
+      display: none !important;
+    }
+
+    /* Error Message */
+    .error-message {
+      color: var(--color-danger);
+      font-size: var(--font-size-sm);
+      margin-top: var(--spacing-xs);
+      display: none;
+      font-weight: var(--font-weight-medium);
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .form-control.is-invalid {
+      border-color: var(--color-danger);
+    }
+
+    .form-control.is-invalid:focus {
+      border-color: var(--color-danger);
+      box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <img src="images/logo.png" alt="Department Logo" />
+      <h1>College of Computing and Information Sciences</h1>
+    </div>
+    <div class="header-right">
+      <a href="contact_us.html"><i class="bi bi-envelope"></i> Contact Us</a>
+    </div>
+  </header>
+  <div class="yellow-accent"></div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-card">
+    <img src="images/logo.png" alt="Logo" class="logo" />
+    <h3>CCIS E-Bulod</h3>
+    <p>Login to continue</p>
+
+    <form id="loginForm">
+      <div class="mb-3 text-start">
+        <label for="studentId" class="form-label">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          id="studentId"
+          placeholder="xx-xxxxxx"
+          required
+        />
+      </div>
+
+      <div class="mb-4 text-start">
+        <label for="password" class="form-label">Password</label>
+        <div class="password-wrapper">
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            placeholder="Enter your password"
+            required
+          />
+          <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+            <i class="bi bi-eye" id="passwordToggleIcon"></i>
+          </button>
+        </div>
+        <div class="error-message" id="errorMessage"></div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+  </div>
+
+  <!-- Firebase v8 Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <!-- Password Toggle Script -->
+  <script>
+    (function() {
+      // Use IIFE to prevent multiple executions
+      if (window.passwordToggleInitialized) return;
+      window.passwordToggleInitialized = true;
+      
+      function initPasswordToggle() {
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+
+        if (!passwordToggle || !passwordInput || !passwordToggleIcon) {
+          return;
+        }
+
+        // Remove any existing click handlers
+        const newToggle = passwordToggle.cloneNode(true);
+        passwordToggle.parentNode.replaceChild(newToggle, passwordToggle);
+        
+        // Get the icon element - make sure we only have one
+        const icon = newToggle.querySelector('i');
+        if (!icon) return;
+        
+        // Ensure only one icon exists - remove any duplicates
+        const allIcons = newToggle.querySelectorAll('i');
+        if (allIcons.length > 1) {
+          // Keep only the first icon, remove the rest
+          for (let i = 1; i < allIcons.length; i++) {
+            allIcons[i].remove();
+          }
+        }
+        
+        // Set initial icon state
+        icon.className = 'bi bi-eye';
+        icon.id = 'passwordToggleIcon';
+        
+        // Add click handler
+        newToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordInput.setAttribute('type', type);
+          
+          // Toggle icon - ensure we only have one icon class
+          if (type === 'text') {
+            icon.className = 'bi bi-eye-slash';
+          } else {
+            icon.className = 'bi bi-eye';
+          }
+        });
+        
+        // Prevent browser from adding its own password reveal button
+        passwordInput.setAttribute('autocomplete', 'current-password');
+        passwordInput.style.paddingRight = '45px';
+        
+        // Watch for any dynamically added icons and remove duplicates
+        const observer = new MutationObserver(function(mutations) {
+          const toggle = document.getElementById('passwordToggle');
+          if (!toggle) return;
+          
+          const icons = toggle.querySelectorAll('i');
+          if (icons.length > 1) {
+            // Keep only the first icon
+            for (let i = 1; i < icons.length; i++) {
+              icons[i].remove();
+            }
+          }
+        });
+        
+        // Observe the toggle button for any changes
+        observer.observe(newToggle, { childList: true, subtree: true });
+        
+        // Also watch the password wrapper
+        const passwordWrapper = passwordInput.closest('.password-wrapper');
+        if (passwordWrapper) {
+          observer.observe(passwordWrapper, { childList: true, subtree: true });
+        }
+      }
+      
+      // Initialize when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPasswordToggle);
+      } else {
+        initPasswordToggle();
+      }
+      
+      // Also initialize after a short delay to catch any dynamic additions
+      setTimeout(initPasswordToggle, 100);
+    })();
+  </script>
+
+  <!-- Unified Authentication Script -->
+  <script src="./js/auth_unified.js?v=2.0"></script>
+
+  <!-- FOOTER -->
+  <footer>
+  </br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+    © 2025 College of Computing and Information Sciences — CCIS E-Bulod System
+  </footer>
+</body>
+</html>

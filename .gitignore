@@ -1,0 +1,54 @@
+# Sensitive Configuration Files
+api/config.php
+delete_cloudinary_image.php
+js/cloudinary.js
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+error_log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# PHP
+vendor/
+composer.lock
+*.cache
+
+# Node modules (if any)
+node_modules/
+package-lock.json
+
+# Rate limiting files
+api_rate_limit.json
+
+# Uploads (if storing locally)
+uploads/*
+!uploads/.gitkeep
+
+# Backup files
+*.bak
+*.backup
+*~
+
+

@@ -1,0 +1,3349 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — CCIS E-Bulod</title>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    /* ============================================
+       DESIGN SYSTEM - Centralized Design Tokens
+       ============================================ */
+    :root {
+      /* Colors - Primary Palette */
+      --color-primary: #002b5c;
+      --color-primary-dark: #001a3d;
+      --color-primary-light: #004080;
+      --color-secondary: #ffb400;
+      --color-secondary-dark: #cc9000;
+      
+      /* Colors - Status Palette */
+      --color-success: #10b981;
+      --color-success-light: #d1fae5;
+      --color-danger: #ef4444;
+      --color-danger-light: #fee2e2;
+      --color-warning: #f59e0b;
+      --color-warning-light: #fef3c7;
+      --color-info: #0ea5e9;
+      --color-info-light: #e0f2fe;
+      
+      /* Colors - Neutral Palette */
+      --color-bg-primary: #ffffff;
+      --color-bg-secondary: #f8fafc;
+      --color-bg-tertiary: #f1f5f9;
+      --color-text-primary: #1e293b;
+      --color-text-secondary: #64748b;
+      --color-text-muted: #94a3b8;
+      --color-border: #e5e7eb;
+      --color-border-light: #f1f5f9;
+      
+      /* Sidebar Colors */
+      --color-sidebar-bg: #1e293b;
+      --color-sidebar-hover: #334155;
+      --color-sidebar-active: #0ea5e9;
+      
+      /* Typography */
+      --font-family: 'Poppins', sans-serif;
+      --font-size-xs: 0.75rem;
+      --font-size-sm: 0.875rem;
+      --font-size-base: 1rem;
+      --font-size-lg: 1.125rem;
+      --font-size-xl: 1.25rem;
+      --font-size-2xl: 1.5rem;
+      --font-size-3xl: 1.875rem;
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --line-height-tight: 1.25;
+      --line-height-normal: 1.5;
+      --line-height-relaxed: 1.75;
+      
+      /* Spacing System */
+      --spacing-xs: 0.25rem;   /* 4px */
+      --spacing-sm: 0.5rem;    /* 8px */
+      --spacing-md: 1rem;      /* 16px */
+      --spacing-lg: 1.5rem;    /* 24px */
+      --spacing-xl: 2rem;      /* 32px */
+      --spacing-2xl: 3rem;     /* 48px */
+      --spacing-3xl: 4rem;     /* 64px */
+      
+      /* Border Radius */
+      --radius-sm: 0.375rem;   /* 6px */
+      --radius-md: 0.5rem;     /* 8px */
+      --radius-lg: 0.75rem;    /* 12px */
+      --radius-xl: 1rem;       /* 16px */
+      --radius-2xl: 1.5rem;    /* 24px */
+      --radius-full: 9999px;
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Transitions */
+      --transition-fast: 0.15s ease;
+      --transition-base: 0.2s ease;
+      --transition-slow: 0.3s ease;
+    }
+    
+    /* ============================================
+       BASE STYLES
+       ============================================ */
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-base);
+      line-height: var(--line-height-normal);
+    }
+
+    .sidebar {
+      background-color: var(--color-sidebar-bg);
+      min-height: 100vh;
+      color: #fff;
+      padding-top: var(--spacing-xl);
+      position: fixed;
+      width: 250px;
+      z-index: 1000;
+    }
+
+    .sidebar a {
+      display: block;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      padding: var(--spacing-md) var(--spacing-xl);
+      transition: var(--transition-base);
+      cursor: pointer;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background-color: var(--color-sidebar-hover);
+      color: #fff;
+      border-left: 4px solid var(--color-sidebar-active);
+    }
+
+    .content {
+      margin-left: 260px;
+      padding: var(--spacing-2xl);
+    }
+
+    /* ============================================
+       CARD STYLES
+       ============================================ */
+    .stat-card {
+      background: var(--color-bg-primary);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, currentColor, transparent);
+      opacity: 0.6;
+    }
+    
+    .stat-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      transform: translateY(-4px);
+    }
+    
+    .stat-card .stat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+      opacity: 0.9;
+    }
+    
+    .stat-card h6 {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      opacity: 0.7;
+    }
+    
+    .stat-card h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .border-sky { 
+      color: #0ea5e9;
+    }
+    .border-sky .stat-icon {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      color: white;
+    }
+    
+    .border-green { 
+      color: #10b981;
+    }
+    .border-green .stat-icon {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    
+    .border-amber { 
+      color: #f59e0b;
+    }
+    .border-amber .stat-icon {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+    
+    .border-red { 
+      color: #ef4444;
+    }
+    .border-red .stat-icon {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .filter-card,
+    .report-card {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      margin-bottom: var(--spacing-xl);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border-light);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    /* ============================================
+       LOADING & EMPTY STATES
+       ============================================ */
+    .loading {
+      text-align: center;
+      padding: var(--spacing-3xl);
+      color: var(--color-text-secondary);
+    }
+
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+      border-width: 0.25em;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-3xl);
+      color: var(--color-text-secondary);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .empty-state p {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-secondary);
+      margin-top: var(--spacing-lg);
+    }
+
+    /* ============================================
+       ALERT/TOAST STYLES
+       ============================================ */
+    .alert-toast {
+      position: fixed;
+      top: var(--spacing-xl);
+      right: var(--spacing-xl);
+      z-index: 9999;
+      min-width: 300px;
+      max-width: 400px;
+    }
+    
+    .alert {
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md) var(--spacing-lg);
+      box-shadow: var(--shadow-lg);
+      border: none;
+    }
+
+    .table-responsive {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    /* ============================================
+       BUTTON STYLES - Standardized
+       ============================================ */
+    .btn {
+      font-family: var(--font-family);
+      font-weight: var(--font-weight-medium);
+      padding: var(--spacing-sm) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      transition: var(--transition-base);
+      border: none;
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-tight);
+    }
+    
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: #fff;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--color-primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-secondary {
+      background-color: var(--color-text-secondary);
+      color: #fff;
+    }
+    
+    .btn-success {
+      background-color: var(--color-success);
+      color: #fff;
+    }
+    
+    .btn-success:hover {
+      background-color: #059669;
+    }
+    
+    .btn-danger {
+      background-color: var(--color-danger);
+      color: #fff;
+    }
+    
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+    
+    .btn-warning {
+      background-color: var(--color-warning);
+      color: #fff;
+    }
+    
+    .btn-outline-secondary {
+      border: 1px solid var(--color-border);
+      background-color: transparent;
+      color: var(--color-text-secondary);
+    }
+    
+    .btn-outline-secondary:hover {
+      background-color: var(--color-bg-tertiary);
+      border-color: var(--color-text-secondary);
+    }
+    
+    .btn-outline-primary {
+      border: 1px solid var(--color-primary);
+      background-color: transparent;
+      color: var(--color-primary);
+    }
+    
+    .btn-outline-primary:hover {
+      background-color: var(--color-primary);
+      color: #fff;
+    }
+    
+    .btn-sm {
+      padding: var(--spacing-xs) var(--spacing-md);
+      font-size: var(--font-size-xs);
+    }
+
+    /* ============================================
+       BADGE STYLES
+       ============================================ */
+    .badge-status {
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .pagination {
+      margin-top: var(--spacing-xl);
+    }
+
+    /* Sticky section title */
+    /* ============================================
+       SECTION TITLE
+       ============================================ */
+    .section-title {
+      position: sticky;
+      top: 0;
+      z-index: 500;
+      background: var(--color-bg-secondary);
+      padding: var(--spacing-md) 0 var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .section-title h2 {
+      margin: 0;
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-2xl);
+      color: var(--color-text-primary);
+    }
+    .notification-icon-wrapper {
+      position: relative;
+    }
+    .notifications-dropdown {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      width: 320px;
+      max-height: 500px;
+      overflow-y: auto;
+      z-index: 1050;
+      display: none;
+    }
+
+    .notifications-dropdown.show {
+      display: block !important;
+    }
+
+    .notifications-header {
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--color-bg-secondary);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .notifications-header h6 {
+      margin: 0;
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-base);
+      color: var(--color-text-primary);
+    }
+
+    .notifications-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .notification-item {
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border-light);
+      cursor: pointer;
+      transition: var(--transition-base);
+    }
+
+    .notification-item:hover {
+      background: var(--color-bg-secondary);
+    }
+
+    .notification-item.unread {
+      background: var(--color-info-light);
+      border-left: 3px solid var(--color-info);
+    }
+
+    .notification-item .notification-time {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      margin-top: var(--spacing-xs);
+    }
+
+    .notification-item p {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      line-height: 1.4;
+    }
+
+    .notification-item.unread p {
+      font-weight: var(--font-weight-medium);
+    }
+
+    @media (max-width: 768px) {
+      .notifications-dropdown {
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-width: calc(100% - 20px);
+      }
+    }
+    .request-card {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+    .request-card.approved {
+      border-left: 4px solid var(--color-success);
+    }
+    .request-card.rejected {
+      border-left: 4px solid var(--color-danger);
+    }
+    .request-card.pending {
+      border-left: 4px solid var(--color-warning);
+    }
+
+    /* Quick Filter Buttons */
+    .quick-filter.active {
+      background-color: var(--color-primary);
+      color: #fff;
+      border-color: var(--color-primary);
+    }
+
+    /* Mobile header and responsive sidebar */
+    .mobile-header {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 1100;
+      background: var(--color-bg-primary);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-md) var(--spacing-lg);
+      box-shadow: var(--shadow-sm);
+    }
+    .mobile-header .btn-menu {
+      background: var(--color-sidebar-bg);
+      color: #fff;
+      border: none;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
+      transition: var(--transition-base);
+    }
+    
+    .mobile-header .btn-menu:hover {
+      background: var(--color-sidebar-hover);
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 900;
+    }
+
+    @media (max-width: 991.98px) {
+      .mobile-header { display: block; }
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.show { display: block; }
+      .content { margin-left: 0; padding: 20px; }
+      .stat-card { margin-bottom: 12px; }
+      .table-responsive { overflow-x: auto; }
+    }
+
+    @media print {
+      .sidebar, .no-print {
+        display: none !important;
+      }
+      .content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Mobile Header -->
+  <div class="mobile-header">
+    <button id="mobileMenuBtn" class="btn-menu"><i class="bi bi-list"></i></button>
+    <span class="ms-2 fw-semibold">CCIS E-Bulod — Admin</span>
+  </div>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- Alert Toast Container -->
+  <div id="alertContainer" class="alert-toast"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="text-center mb-4">
+      <img src="images/logo.png" alt="Logo" width="60" class="mx-auto mb-2 d-block">
+      <h5 class="fw-bold mb-0">CCIS E-Bulod</h5>
+      <small class="text-secondary">Admin Portal</small>
+    </div>
+    <a href="#" class="nav-link active" data-section="dashboard">
+      <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+    <a href="#" class="nav-link" data-section="equipment">
+      <i class="bi bi-box-seam me-2"></i>Equipment
+    </a>
+    <a href="#" class="nav-link" data-section="requests" id="requestsNavLink">
+      <i class="bi bi-clipboard-check me-2"></i>Requests
+      <span class="badge bg-danger ms-2" id="pendingRequestsBadge" style="display: none;">0</span>
+    </a>
+    <a href="#" class="nav-link" data-section="reports">
+      <i class="bi bi-file-earmark-text me-2"></i>Reports
+    </a>
+    <a href="#" class="nav-link" data-section="borrowers">
+      <i class="bi bi-people me-2"></i>Manage Borrowers
+    </a>
+    <a href="#" id="logoutBtn" class="mt-3">
+      <i class="bi bi-box-arrow-right me-2"></i>Logout
+    </a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <div class="section-title">
+      <h2 id="sectionTitleText">Dashboard Overview</h2>
+      <div class="notification-icon-wrapper">
+        <button class="btn btn-link position-relative" id="notificationIcon" style="color: var(--color-text-primary); text-decoration: none;">
+          <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
+          <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" id="notificationBadge" style="display: none;">0</span>
+        </button>
+      </div>
+    </div>
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="section active">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold d-none">Dashboard Overview</h2>
+      <span id="adminName" class="text-muted">Welcome, Admin</span>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+        <div class="stat-card border-sky">
+          <div class="stat-icon">
+            <i class="bi bi-box-seam"></i>
+        </div>
+          <h6>Total Equipment</h6>
+          <h2 id="totalEquipment">0</h2>
+      </div>
+      </div>
+        <div class="col-md-3">
+        <div class="stat-card border-green">
+          <div class="stat-icon">
+            <i class="bi bi-check-circle"></i>
+        </div>
+          <h6>Available</h6>
+          <h2 id="availableEquipment">0</h2>
+      </div>
+      </div>
+        <div class="col-md-3">
+        <div class="stat-card border-amber">
+          <div class="stat-icon">
+            <i class="bi bi-box-arrow-right"></i>
+          </div>
+          <h6>Borrowed</h6>
+          <h2 id="borrowedEquipment">0</h2>
+        </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card border-red">
+          <div class="stat-icon">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <h6>Pending Requests</h6>
+          <h2 id="pendingRequests">0</h2>
+        </div>
+      </div>
+    </div>
+
+      <!-- Recent Activity -->
+      <div class="bg-white p-4 rounded-3 shadow-sm border-0" style="border-top: 3px solid #0ea5e9 !important;">
+        <div class="d-flex align-items-center mb-4">
+          <div class="me-3" style="width: 4px; height: 32px; background: linear-gradient(180deg, #0ea5e9, #0284c7); border-radius: 2px;"></div>
+          <h5 class="fw-bold mb-0" style="font-size: 18px;">Recent Activity</h5>
+        </div>
+        <div id="recentActivity" class="loading">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipment Section -->
+    <div id="equipmentSection" class="section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold d-none">Equipment Management</h2>
+        <div>
+          <button id="bulkEquipmentActionsBtn" class="btn btn-secondary me-2" style="display: none;" data-bs-toggle="dropdown">
+            <i class="bi bi-three-dots-vertical"></i> Bulk Actions
+          </button>
+          <ul class="dropdown-menu" id="bulkEquipmentActionsMenu">
+            <li><a class="dropdown-item" href="#" id="bulkStatusAvailable">Mark as Available</a></li>
+            <li><a class="dropdown-item" href="#" id="bulkStatusBorrowed">Mark as Borrowed</a></li>
+            <li><a class="dropdown-item" href="#" id="bulkStatusUnderRepair">Mark as Under Repair</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" id="bulkConditionGood">Set Condition to Good</a></li>
+            <li><a class="dropdown-item" href="#" id="bulkConditionDamaged">Set Condition to Damaged</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="bulkDeleteEquipment">Delete Selected</a></li>
+          </ul>
+          <button id="addEquipBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
+          <i class="bi bi-plus-lg"></i> Add Equipment
+        </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-card">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Search</label>
+            <input type="text" id="searchEquipment" class="form-control" placeholder="Search by name, category, location...">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Category</label>
+            <input type="text" id="filterCategory" class="form-control" placeholder="Category...">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Status</label>
+            <select id="filterStatus" class="form-select">
+              <option value="">All Status</option>
+              <option value="Available">Available</option>
+              <option value="Borrowed">Borrowed</option>
+              <option value="Under Repair">Under Repair</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Condition</label>
+            <select id="filterCondition" class="form-select">
+              <option value="">All Conditions</option>
+              <option value="Good">Good</option>
+              <option value="Damaged">Damaged</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Sort By</label>
+            <select id="sortEquipment" class="form-select">
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="name-desc">Name (Z-A)</option>
+              <option value="category-asc">Category (A-Z)</option>
+              <option value="category-desc">Category (Z-A)</option>
+              <option value="status-asc">Status</option>
+              <option value="location-asc">Location (A-Z)</option>
+            </select>
+          </div>
+          <div class="col-md-1 d-flex align-items-end">
+            <button id="clearFilters" class="btn btn-outline-secondary w-100" title="Clear all filters">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          </div>
+        </div>
+        <div class="row g-3 mt-2">
+          <div class="col-md-12">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-sm btn-outline-primary quick-filter" data-filter="available">
+                <i class="bi bi-check-circle"></i> Available Only
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-warning quick-filter" data-filter="borrowed">
+                <i class="bi bi-box-arrow-right"></i> Borrowed Only
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger quick-filter" data-filter="damaged">
+                <i class="bi bi-exclamation-triangle"></i> Damaged Only
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-info quick-filter" data-filter="repair">
+                <i class="bi bi-tools"></i> Under Repair
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equipment Table -->
+      <div class="bg-white p-4 rounded shadow-sm">
+        <div id="equipmentLoading" class="loading" style="display: none;">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <div class="table-responsive">
+      <table class="table table-hover align-middle">
+            <thead class="table-light sticky-top">
+          <tr>
+                <th style="width: 50px;">
+                  <input type="checkbox" id="selectAllEquipment" class="form-check-input" title="Select All">
+                </th>
+                <th style="width: 100px;">Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Condition</th>
+            <th>Location</th>
+            <th>Barcode</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="equipmentTableBody"></tbody>
+      </table>
+        </div>
+        <div id="equipmentPagination" class="pagination justify-content-center"></div>
+      </div>
+    </div>
+
+    <!-- Reports Section -->
+    <div id="reportsSection" class="section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold d-none">Reports</h2>
+        <div>
+          <button id="printReport" class="btn btn-outline-primary no-print" onclick="window.print()">
+            <i class="bi bi-printer"></i> Print Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Report Type Selector -->
+      <div class="filter-card no-print">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Report Type</label>
+            <select id="reportType" class="form-select">
+              <option value="inventory">Equipment Inventory Report</option>
+              <option value="status">Equipment Status Report</option>
+              <option value="borrowing">Borrowing Activity Report</option>
+              <option value="borrower">Borrower Activity Report</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Date From</label>
+            <input type="date" id="reportDateFrom" class="form-control">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Date To</label>
+            <input type="date" id="reportDateTo" class="form-control">
+          </div>
+          <div class="col-md-2 d-flex align-items-end gap-2">
+            <button id="generateReport" class="btn btn-primary flex-fill">
+              <i class="bi bi-search"></i> Generate
+            </button>
+            <button id="exportReport" class="btn btn-success" style="display: none;" title="Export to CSV">
+              <i class="bi bi-download"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Content -->
+      <div id="reportContent">
+        <div class="report-card">
+          <div class="text-center text-muted py-5">
+            <i class="bi bi-file-earmark-text" style="font-size: 3rem;"></i>
+            <p class="mt-3">Select a report type and click Generate to view reports</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requests Management Section -->
+    <div id="requestsSection" class="section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold d-none">Request Management</h2>
+        <div>
+          <button id="batchApproveBtn" class="btn btn-success me-2" style="display: none;">
+            <i class="bi bi-check-circle"></i> Approve Selected
+          </button>
+          <button id="batchRejectBtn" class="btn btn-danger" style="display: none;">
+            <i class="bi bi-x-circle"></i> Reject Selected
+          </button>
+        </div>
+      </div>
+
+      <!-- Request Filters -->
+      <div class="filter-card">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Search</label>
+            <input type="text" id="searchRequests" class="form-control" placeholder="Search by borrower ID or equipment...">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Status</label>
+            <select id="filterRequestStatus" class="form-select">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="returned">Returned</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Date From</label>
+            <input type="date" id="filterRequestDateFrom" class="form-control">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Date To</label>
+            <input type="date" id="filterRequestDateTo" class="form-control">
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button id="clearRequestFilters" class="btn btn-outline-secondary w-100">
+              <i class="bi bi-x-circle"></i> Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Requests Table -->
+      <div class="bg-white p-4 rounded shadow-sm">
+        <div id="requestsLoading" class="loading" style="display: none;">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 50px;">
+                  <input type="checkbox" id="selectAllRequests" class="form-check-input">
+                </th>
+                <th>Borrower ID</th>
+                <th>Equipment</th>
+                <th>Purpose</th>
+                <th>Request Date</th>
+                <th>Return Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="requestsTableBody"></tbody>
+          </table>
+        </div>
+        <div id="requestsPagination" class="pagination justify-content-center mt-3"></div>
+      </div>
+    </div>
+
+    <!-- Manage Borrowers Section -->
+    <div id="borrowersSection" class="section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+          <div class="me-3" style="width: 4px; height: 32px; background: linear-gradient(180deg, #3b82f6, #2563eb); border-radius: 2px;"></div>
+          <h2 class="fw-bold mb-0" style="font-size: 24px;">Manage Borrowers</h2>
+        </div>
+        <div>
+          <div class="input-group" style="width: 300px;">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="text" id="searchBorrowers" class="form-control border-start-0" placeholder="Search borrowers...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Borrowers Table -->
+      <div class="bg-white p-4 rounded-3 shadow-sm border-0" style="border-top: 3px solid #3b82f6 !important;">
+        <div id="borrowersLoading" class="loading" style="display: none;">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Student ID</th>
+                <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Name</th>
+                <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Email</th>
+                <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Course</th>
+                <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Year Level</th>
+                <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Total Requests</th>
+                <th style="font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 16px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="borrowersTableBody" style="background: white;"></tbody>
+          </table>
+        </div>
+        <div id="borrowersPagination" class="pagination justify-content-center mt-4"></div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Add/Edit Equipment Modal -->
+    <div class="modal fade" id="addEquipmentModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="equipmentForm">
+            <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">Add Equipment</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" id="equipmentId">
+
+              <div class="mb-3">
+              <label class="form-label">Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="equipName" required>
+              </div>
+
+              <div class="mb-3">
+              <label class="form-label">Category <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="equipCategory" required>
+              </div>
+
+              <div class="mb-3">
+              <label class="form-label">Status <span class="text-danger">*</span></label>
+              <select class="form-select" id="equipStatus" required>
+                <option value="Available">Available</option>
+                <option value="Borrowed">Borrowed</option>
+                <option value="Under Repair">Under Repair</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+              <label class="form-label">Condition <span class="text-danger">*</span></label>
+              <select class="form-select" id="equipCondition" required>
+                <option value="Good">Good</option>
+                <option value="Damaged">Damaged</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+              <label class="form-label">Location <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="equipLocation" required>
+              </div>
+
+            <div class="mb-3">
+              <label class="form-label">Equipment Image</label>
+              <input type="file" class="form-control" id="equipImage" accept="image/*">
+              <small class="text-muted">Accepted formats: JPG, PNG, GIF (Max 5MB)</small>
+              <div id="imagePreview" class="mt-3 text-center" style="display: none;">
+                <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #dee2e6;">
+                <button type="button" class="btn btn-sm btn-danger mt-2" id="removeImageBtn" style="display: none;">
+                  <i class="bi bi-trash"></i> Remove Image
+                </button>
+              </div>
+              </div>
+
+              <div class="text-center">
+                <svg id="barcode"></svg>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" id="generateBarcodeBtn" class="btn btn-outline-secondary me-auto">Generate Barcode</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-success">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+  </div>
+
+  <!-- Request Details Modal -->
+  <div class="modal fade" id="requestDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Request Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="requestDetailsContent">
+          <!-- Content will be loaded dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approve/Reject Request Modal -->
+  <div class="modal fade" id="approveRejectModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="approveRejectModalTitle">Approve Request</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="requestActionId">
+          <input type="hidden" id="requestActionType">
+          <div class="mb-3">
+            <label class="form-label">Admin Comment (Optional)</label>
+            <textarea class="form-control" id="adminComment" rows="3" placeholder="Add a comment..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirmRequestAction">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Return Equipment Modal -->
+  <div class="modal fade" id="returnEquipmentModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Return Equipment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="returnRequestId">
+          <input type="hidden" id="returnEquipmentId">
+          <div class="mb-3">
+            <label class="form-label">Equipment Condition on Return <span class="text-danger">*</span></label>
+            <select class="form-select" id="returnCondition" required>
+              <option value="Good">Good</option>
+              <option value="Damaged">Damaged</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Return Notes (Optional)</label>
+            <textarea class="form-control" id="returnNotes" rows="3" placeholder="Any notes about the equipment condition..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" id="confirmReturnEquipment">Mark as Returned</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Borrower Details Modal -->
+  <div class="modal fade" id="borrowerDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Borrower Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="borrowerDetailsContent">
+          <!-- Content will be loaded dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Equipment History Modal -->
+  <div class="modal fade" id="equipmentHistoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Equipment Borrowing History</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="equipmentHistoryContent">
+          <!-- Content will be loaded dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications Dropdown -->
+  <div class="notifications-dropdown" id="notificationsDropdown">
+    <div class="notifications-header">
+      <h6>Notifications</h6>
+      <button class="btn btn-sm btn-link p-0" id="markAllReadBtn" style="font-size: 0.75rem; text-decoration: none;">Mark all as read</button>
+    </div>
+    <div class="notifications-list" id="notificationsList">
+      <div class="notification-item">
+        <p class="text-muted text-center mb-0">Loading notifications...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Client -->
+  <script src="js/api.js?v=2.6"></script>
+  <script src="js/form-validation.js"></script>
+  <!-- Cloudinary Configuration -->
+  <script src="js/cloudinary.js"></script>
+  <!-- Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Global Variables
+    let allEquipment = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let filteredEquipment = [];
+    let jsBarcodeLoaded = false;
+    
+    // Request Management Variables
+    let allRequests = [];
+    let filteredRequests = [];
+    let selectedRequestIds = [];
+    
+    // Borrower Management Variables
+    let allBorrowers = [];
+    let filteredBorrowers = [];
+    
+    // Notifications
+    let notifications = [];
+
+    // Session check - with delay to allow page to render first
+    // This prevents immediate redirect in preview/file manager contexts
+    setTimeout(() => {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) {
+        // Only redirect if we're not in a preview/iframe context
+        // File manager previews often don't have localStorage
+        if (window.self === window.top) {
+          window.location.href = "index.html";
+        }
+      } else {
+        const adminNameEl = document.getElementById("adminName");
+        if (adminNameEl) {
+          adminNameEl.textContent = `Welcome, ${adminId}`;
+        }
+      }
+    }, 100);
+
+    // Mobile sidebar toggle
+    const sidebarEl = document.getElementById('sidebar');
+    const overlayEl = document.getElementById('sidebarOverlay');
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+
+    function openSidebar() {
+      if (sidebarEl) sidebarEl.classList.add('open');
+      if (overlayEl) overlayEl.classList.add('show');
+    }
+    function closeSidebar() {
+      if (sidebarEl) sidebarEl.classList.remove('open');
+      if (overlayEl) overlayEl.classList.remove('show');
+    }
+    if (mobileBtn) mobileBtn.addEventListener('click', openSidebar);
+    if (overlayEl) overlayEl.addEventListener('click', closeSidebar);
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 992) closeSidebar();
+      });
+    });
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      try {
+        await AuthAPI.logout();
+      localStorage.removeItem("adminId");
+        localStorage.removeItem("userRole");
+        showAlert("Logged out successfully!", "success");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1000);
+      } catch (error) {
+        console.error("Logout error:", error);
+        localStorage.removeItem("adminId");
+        localStorage.removeItem("userRole");
+        window.location.href = "index.html";
+      }
+    });
+
+    // Navigation System
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = link.getAttribute('data-section');
+        if (section) {
+          switchSection(section);
+        }
+      });
+
+      // Accessibility: Keyboard navigation support
+      link.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          link.click();
+        }
+      });
+    });
+
+    function switchSection(sectionName) {
+      // Remove active class from all links and sections
+      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+
+      // Add active class to clicked link
+      document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+
+      // Show corresponding section
+      const sectionId = `${sectionName}Section`;
+      document.getElementById(sectionId).classList.add('active');
+
+      // Update sticky title and persist state
+      const titleMap = {
+        dashboard: 'Dashboard Overview',
+        equipment: 'Equipment Management',
+        requests: 'Request Management',
+        reports: 'Reports',
+        borrowers: 'Manage Borrowers'
+      };
+      const title = titleMap[sectionName] || 'Dashboard';
+      const titleEl = document.getElementById('sectionTitleText');
+      if (titleEl) titleEl.textContent = title;
+      try { localStorage.setItem('adminActiveSection', sectionName); } catch (e) {}
+
+      // Load section data
+      if (sectionName === 'equipment') {
+        loadEquipments();
+      } else if (sectionName === 'dashboard') {
+        loadDashboardStats();
+        loadRecentActivity();
+      } else if (sectionName === 'requests') {
+        loadRequests();
+      } else if (sectionName === 'borrowers') {
+        loadBorrowers();
+      } else if (sectionName === 'reports') {
+        // Reports will load when Generate is clicked
+      }
+    }
+
+    // Alert System
+    function showAlert(message, type = 'info') {
+      const alertContainer = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} alert-dismissible fade show`;
+      alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      alertContainer.innerHTML = '';
+      alertContainer.appendChild(alert);
+
+      setTimeout(() => {
+        alert.remove();
+      }, 3000);
+    }
+
+    // Generate Unique Barcode
+    async function generateUniqueBarcode() {
+      let barcode;
+      let exists = true;
+      while (exists) {
+        barcode = 'EQ-' + Math.floor(100000 + Math.random() * 900000);
+        // Check if barcode exists
+        const equipment = await EquipmentAPI.getAll();
+        exists = equipment.some(eq => eq.barcode === barcode);
+      }
+      return barcode;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Format time from 24-hour format (HH:mm) to 12-hour format (h:mm AM/PM)
+    function formatTime(time24) {
+      if (!time24) return '';
+      const [hours, minutes] = time24.split(':');
+      const hour = parseInt(hours, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${minutes} ${ampm}`;
+    }
+
+    // Format timestamp to show only time (h:mm AM/PM)
+    function formatTimeOnly(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      const hours = date.getHours();
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const hour12 = hours % 12 || 12;
+      return `${hour12}:${minutes} ${ampm}`;
+    }
+
+    // Get return date - use returnedAt date if available, otherwise use returnDate
+    function getReturnDate(request) {
+      if (request.returnedAt) {
+        return new Date(request.returnedAt).toLocaleDateString();
+      }
+      return request.returnDate || 'N/A';
+    }
+
+    // Load Dashboard Stats
+    async function loadDashboardStats() {
+      try {
+        const stats = await DashboardAPI.getStats();
+        
+        document.getElementById("totalEquipment").textContent = stats.totalEquipment || 0;
+        document.getElementById("availableEquipment").textContent = stats.availableEquipment || 0;
+        document.getElementById("borrowedEquipment").textContent = stats.borrowedEquipment || 0;
+        document.getElementById("pendingRequests").textContent = stats.pendingRequests || 0;
+      } catch (error) {
+        console.error("Error loading stats:", error);
+        showAlert("Error loading dashboard statistics", "danger");
+      }
+    }
+
+    // Load Recent Activity
+    async function loadRecentActivity() {
+      const activityDiv = document.getElementById("recentActivity");
+      try {
+        const activities = await DashboardAPI.getRecentActivity();
+
+        if (!activities || activities.length === 0) {
+          activityDiv.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>No recent activity</p></div>';
+          return;
+        }
+
+        let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+        activities.forEach(activity => {
+          const date = activity.timestamp ? new Date(activity.timestamp).toLocaleDateString() : 'N/A';
+          const status = (activity.status || 'Pending').toLowerCase();
+          const statusColor = status.includes('approved') ? '#10b981' : 
+                             status.includes('pending') ? '#f59e0b' : 
+                             status.includes('rejected') ? '#ef4444' : '#64748b';
+          html += `
+            <div style="background: white; border-radius: 12px; padding: 16px; border-left: 4px solid ${statusColor}; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.2s ease;"
+                 onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'; this.style.transform='translateX(4px)';"
+                 onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)'; this.style.transform='translateX(0)';">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                  <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #0ea5e9, #0284c7); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+                    <i class="bi bi-person"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">
+                      <strong>${escapeHtml(activity.borrowerId || 'Unknown')}</strong> requested equipment
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge" style="background: ${statusColor}; border: none; padding: 4px 10px; font-size: 11px; font-weight: 600;">${escapeHtml(activity.status || 'Pending')}</span>
+                      <span style="font-size: 12px; color: #94a3b8;">•</span>
+                      <span style="font-size: 12px; color: #64748b;">${date}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        activityDiv.innerHTML = html;
+      } catch (error) {
+        console.error("Error loading activity:", error);
+        activityDiv.innerHTML = "<p class='text-danger'>Error loading recent activity</p>";
+      }
+    }
+
+    // Lazy load JsBarcode library
+    async function loadJsBarcode() {
+      if (jsBarcodeLoaded || typeof JsBarcode !== 'undefined') {
+        jsBarcodeLoaded = true;
+        return Promise.resolve();
+      }
+      
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js';
+        script.onload = () => {
+          jsBarcodeLoaded = true;
+          resolve();
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    // Load Equipments
+    async function loadEquipments() {
+      const tableBody = document.getElementById("equipmentTableBody");
+      const loadingDiv = document.getElementById("equipmentLoading");
+      
+      loadingDiv.style.display = 'block';
+      tableBody.innerHTML = '';
+
+      try {
+        allEquipment = await EquipmentAPI.getAll();
+        filteredEquipment = [...allEquipment];
+        loadingDiv.style.display = 'none';
+        applyFilters();
+      } catch (error) {
+        console.error("Error loading equipment:", error);
+        showAlert("Error loading equipment", "danger");
+        loadingDiv.style.display = 'none';
+      }
+    }
+
+    // Filter Equipment
+    function applyFilters() {
+      const search = document.getElementById("searchEquipment")?.value.toLowerCase() || "";
+      const category = document.getElementById("filterCategory")?.value.toLowerCase() || "";
+      const status = document.getElementById("filterStatus")?.value || "";
+      const condition = document.getElementById("filterCondition")?.value || "";
+      const sortBy = document.getElementById("sortEquipment")?.value || "name-asc";
+
+      filteredEquipment = allEquipment.filter(item => {
+        // Enhanced search - search in name, category, and location
+        const matchesSearch = !search || 
+          item.name?.toLowerCase().includes(search) ||
+          item.category?.toLowerCase().includes(search) ||
+          item.location?.toLowerCase().includes(search);
+        const matchesCategory = !category || item.category?.toLowerCase().includes(category);
+        const matchesStatus = !status || item.status === status;
+        const matchesCondition = !condition || item.condition === condition;
+
+        return matchesSearch && matchesCategory && matchesStatus && matchesCondition;
+      });
+
+      // Apply sorting
+      filteredEquipment.sort((a, b) => {
+        const [field, order] = sortBy.split('-');
+        let aVal = a[field] || '';
+        let bVal = b[field] || '';
+        
+        // Convert to string for comparison
+        aVal = String(aVal).toLowerCase();
+        bVal = String(bVal).toLowerCase();
+        
+        if (order === 'desc') {
+          return bVal.localeCompare(aVal);
+        } else {
+          return aVal.localeCompare(bVal);
+        }
+      });
+
+      currentPage = 1;
+      displayEquipment();
+    }
+
+    // Display Equipment with Pagination
+    function displayEquipment() {
+      const tableBody = document.getElementById("equipmentTableBody");
+      const loadingDiv = document.getElementById("equipmentLoading");
+      const paginationDiv = document.getElementById("equipmentPagination");
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const pageData = filteredEquipment.slice(start, end);
+
+      tableBody.innerHTML = '';
+
+      if (pageData.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="bi bi-search"></i><p>No equipment found</p></div></td></tr>';
+        return;
+      } else {
+        pageData.forEach(item => {
+          const statusBadge = getStatusBadge(item.status);
+          const conditionBadge = getConditionBadge(item.condition);
+          const imageUrl = item.imageUrl || '';
+          const escapedImageUrl = imageUrl ? escapeHtml(imageUrl) : '';
+          const escapedItemName = escapeHtml(item.name);
+          const imageCell = imageUrl 
+            ? `<td><img src="${escapedImageUrl}" alt="${escapedItemName}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6;"></td>`
+            : `<td><div style="width: 60px; height: 60px; background: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #6c757d;"><i class="bi bi-image"></i></div></td>`;
+          
+        const row = `
+          <tr>
+              <td><input type="checkbox" class="form-check-input equipment-checkbox" value="${item.id}" data-equipment-id="${item.id}"></td>
+              ${imageCell}
+              <td>${escapeHtml(item.name)}</td>
+              <td>${escapeHtml(item.category)}</td>
+              <td>${statusBadge}</td>
+              <td>${conditionBadge}</td>
+              <td>${escapeHtml(item.location)}</td>
+              <td><svg id="barcode-${item.id}" style="max-width: 150px;"></svg></td>
+            <td>
+                <button class="btn btn-sm btn-info me-1" onclick="viewEquipmentHistory('${item.id}')" title="View History" aria-label="View equipment history">
+                  <i class="bi bi-clock-history"></i> History
+                </button>
+                <button class="btn btn-sm btn-warning me-1" onclick="editEquipment('${item.id}')" aria-label="Edit equipment">
+                  <i class="bi bi-pencil"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteEquipment('${item.id}')" aria-label="Delete equipment">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+            </td>
+            </tr>
+          `;
+        tableBody.innerHTML += row;
+          
+          if (item.barcode) {
+            // Lazy load JsBarcode only when needed
+            loadJsBarcode().then(() => {
+              setTimeout(() => {
+                try {
+                  if (typeof JsBarcode !== 'undefined') {
+                    JsBarcode(`#barcode-${item.id}`, item.barcode, { format: "CODE128", width: 1.5, height: 40 });
+                  }
+                } catch (e) {
+                  console.error("Barcode error:", e);
+                }
+              }, 100);
+            }).catch(err => console.error("Failed to load JsBarcode:", err));
+        }
+      });
+    }
+
+      // Pagination
+      const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage);
+      paginationDiv.innerHTML = '';
+      
+      if (totalPages > 1) {
+        let paginationHTML = '<ul class="pagination">';
+        
+        // Previous button
+        paginationHTML += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Previous</a>
+        </li>`;
+        
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+          if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            paginationHTML += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+              <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+            </li>`;
+          } else if (i === currentPage - 2 || i === currentPage + 2) {
+            paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+          }
+        }
+        
+        // Next button
+        paginationHTML += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Next</a>
+        </li>`;
+        
+        paginationHTML += '</ul>';
+        paginationDiv.innerHTML = paginationHTML;
+      }
+
+      loadingDiv.style.display = 'none';
+    }
+
+    function changePage(page) {
+      const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage);
+      if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        displayEquipment();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function getStatusBadge(status) {
+      const badges = {
+        'Available': 'badge bg-success badge-status',
+        'Borrowed': 'badge bg-warning badge-status',
+        'Under Repair': 'badge bg-danger badge-status'
+      };
+      return `<span class="${badges[status] || 'badge bg-secondary badge-status'}">${status}</span>`;
+    }
+
+    function getConditionBadge(condition) {
+      const badges = {
+        'Good': 'badge bg-success badge-status',
+        'Damaged': 'badge bg-danger badge-status'
+      };
+      return `<span class="${badges[condition] || 'badge bg-secondary badge-status'}">${condition}</span>`;
+    }
+
+
+    // Filter Event Listeners
+    // Equipment Filter Event Listeners
+    const searchEquipmentInput = document.getElementById("searchEquipment");
+    if (searchEquipmentInput) searchEquipmentInput.addEventListener("input", applyFilters);
+    const filterCategoryInput = document.getElementById("filterCategory");
+    if (filterCategoryInput) filterCategoryInput.addEventListener("input", applyFilters);
+    const filterStatusSelect = document.getElementById("filterStatus");
+    if (filterStatusSelect) filterStatusSelect.addEventListener("change", applyFilters);
+    const filterConditionSelect = document.getElementById("filterCondition");
+    if (filterConditionSelect) filterConditionSelect.addEventListener("change", applyFilters);
+    const sortEquipmentSelect = document.getElementById("sortEquipment");
+    if (sortEquipmentSelect) sortEquipmentSelect.addEventListener("change", applyFilters);
+    
+    const clearFiltersBtn = document.getElementById("clearFilters");
+    if (clearFiltersBtn) {
+      clearFiltersBtn.addEventListener("click", () => {
+        if (searchEquipmentInput) searchEquipmentInput.value = '';
+        if (filterCategoryInput) filterCategoryInput.value = '';
+        if (filterStatusSelect) filterStatusSelect.value = '';
+        if (filterConditionSelect) filterConditionSelect.value = '';
+        if (sortEquipmentSelect) sortEquipmentSelect.value = 'name-asc';
+        // Remove active class from quick filters
+        document.querySelectorAll(".quick-filter").forEach(btn => {
+          btn.classList.remove("active");
+        });
+        applyFilters();
+      });
+    }
+
+    // Quick Filter Buttons
+    document.querySelectorAll(".quick-filter").forEach(btn => {
+      btn.addEventListener("click", function() {
+        // Toggle active state
+        this.classList.toggle("active");
+        
+        // Remove active from other quick filters
+        document.querySelectorAll(".quick-filter").forEach(otherBtn => {
+          if (otherBtn !== this) {
+            otherBtn.classList.remove("active");
+          }
+        });
+
+        const filterType = this.getAttribute("data-filter");
+        
+        // Reset filters first
+        if (searchEquipmentInput) searchEquipmentInput.value = '';
+        if (filterCategoryInput) filterCategoryInput.value = '';
+        if (filterConditionSelect) filterConditionSelect.value = '';
+        
+        // Apply quick filter
+        if (this.classList.contains("active")) {
+          if (filterType === "available") {
+            if (filterStatusSelect) filterStatusSelect.value = "Available";
+          } else if (filterType === "borrowed") {
+            if (filterStatusSelect) filterStatusSelect.value = "Borrowed";
+          } else if (filterType === "damaged") {
+            if (filterConditionSelect) filterConditionSelect.value = "Damaged";
+          } else if (filterType === "repair") {
+            if (filterStatusSelect) filterStatusSelect.value = "Under Repair";
+          }
+        } else {
+          // Clear filters if button is deactivated
+          if (filterStatusSelect) filterStatusSelect.value = '';
+          if (filterConditionSelect) filterConditionSelect.value = '';
+        }
+        
+        applyFilters();
+      });
+    });
+
+    // Equipment Form
+    const form = document.getElementById("equipmentForm");
+    const barcodeSvg = document.getElementById("barcode");
+    const generateBtn = document.getElementById("generateBarcodeBtn");
+    const imageInput = document.getElementById("equipImage");
+    const imagePreview = document.getElementById("imagePreview");
+    const previewImg = document.getElementById("previewImg");
+    const removeImageBtn = document.getElementById("removeImageBtn");
+    let currentImageUrl = null; // Track current image URL for editing
+    let imageFileToUpload = null; // Track new file to upload
+
+    // Image preview functionality
+    imageInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+          showAlert("Image size must be less than 5MB", "danger");
+          imageInput.value = "";
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith("image/")) {
+          showAlert("Please select a valid image file", "danger");
+          imageInput.value = "";
+          return;
+        }
+
+        imageFileToUpload = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          imagePreview.style.display = "block";
+          removeImageBtn.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Remove image
+    removeImageBtn.addEventListener("click", () => {
+      imageInput.value = "";
+      previewImg.src = "";
+      imagePreview.style.display = "none";
+      removeImageBtn.style.display = "none";
+      imageFileToUpload = null;
+      currentImageUrl = null;
+    });
+
+    // Clear image preview when modal is closed
+    document.getElementById("addEquipmentModal").addEventListener("hidden.bs.modal", () => {
+      imageInput.value = "";
+      previewImg.src = "";
+      imagePreview.style.display = "none";
+      removeImageBtn.style.display = "none";
+      imageFileToUpload = null;
+      currentImageUrl = null;
+    });
+
+    generateBtn.addEventListener("click", async () => {
+      try {
+        await loadJsBarcode(); // Ensure JsBarcode is loaded
+      const barcodeValue = await generateUniqueBarcode();
+        if (typeof JsBarcode !== 'undefined') {
+      JsBarcode(barcodeSvg, barcodeValue, { format: "CODE128" });
+        }
+      barcodeSvg.dataset.value = barcodeValue;
+      generateBtn.disabled = true;
+      generateBtn.textContent = "Barcode Generated";
+      } catch (error) {
+        showAlert("Error generating barcode", "danger");
+      }
+    });
+
+    // Upload image to Cloudinary
+    async function uploadImage(file, equipmentId) {
+      try {
+        return await uploadImageToCloudinary(file, equipmentId);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        throw error;
+      }
+    }
+
+    // Delete image from Cloudinary
+    async function deleteImageFromStorage(imageUrl) {
+      try {
+        if (!imageUrl) return;
+        
+        // Extract public_id from Cloudinary URL
+        const publicId = extractPublicIdFromUrl(imageUrl);
+        if (!publicId) {
+          console.warn("Could not extract public_id from URL:", imageUrl);
+          return;
+        }
+
+        // Call PHP endpoint to delete (requires API secret)
+        const response = await fetch('delete_cloudinary_image.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ public_id: publicId })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Error deleting image:", errorData);
+        }
+      } catch (error) {
+        console.error("Error deleting image:", error);
+        // Don't throw - image deletion failure shouldn't block the update
+      }
+    }
+
+    // Prevent duplicate form submissions
+    let isSubmitting = false;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      // Prevent duplicate submissions
+      if (isSubmitting) {
+        showAlert("Please wait, form is being submitted...", "warning");
+        return;
+      }
+      
+      // Validate required fields
+      const name = document.getElementById("equipName").value.trim();
+      const category = document.getElementById("equipCategory").value.trim();
+      const status = document.getElementById("equipStatus").value;
+      const condition = document.getElementById("equipCondition").value;
+      const location = document.getElementById("equipLocation").value.trim();
+      
+      if (!name) {
+        showAlert("Please enter equipment name", "danger");
+        document.getElementById("equipName").focus();
+        return;
+      }
+      if (!category) {
+        showAlert("Please enter category", "danger");
+        document.getElementById("equipCategory").focus();
+        return;
+      }
+      if (!status) {
+        showAlert("Please select status", "danger");
+        document.getElementById("equipStatus").focus();
+        return;
+      }
+      if (!condition) {
+        showAlert("Please select condition", "danger");
+        document.getElementById("equipCondition").focus();
+        return;
+      }
+      if (!location) {
+        showAlert("Please enter location", "danger");
+        document.getElementById("equipLocation").focus();
+        return;
+      }
+      
+      const id = document.getElementById("equipmentId").value;
+      isSubmitting = true;
+      
+      // Show loading state
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+      try {
+        let imageUrl = currentImageUrl; // Start with existing image URL
+
+        // Handle image upload/update
+        if (imageFileToUpload) {
+          // If there's a new image to upload
+          if (id && currentImageUrl) {
+            // Delete old image if editing
+            await deleteImageFromStorage(currentImageUrl);
+          }
+          // Upload new image
+          imageUrl = await uploadImage(imageFileToUpload, id || undefined);
+        } else if (id && !currentImageUrl && imageInput.value === "") {
+          // If editing and removing image (input cleared but no new file)
+          // Keep existing imageUrl (don't change it)
+          // This case is handled by checking if currentImageUrl exists
+        }
+
+      const newData = {
+        name: document.getElementById("equipName").value,
+        category: document.getElementById("equipCategory").value,
+        status: document.getElementById("equipStatus").value,
+        condition: document.getElementById("equipCondition").value,
+        location: document.getElementById("equipLocation").value,
+        barcode: barcodeSvg.dataset.value || null
+      };
+
+        // Only add imageUrl if we have one
+        if (imageUrl) {
+          newData.imageUrl = imageUrl;
+        }
+
+        if (id) {
+          await EquipmentAPI.update(id, newData);
+          showAlert("Equipment updated successfully!", "success");
+        } else {
+          await EquipmentAPI.create(newData);
+          showAlert("Equipment added successfully!", "success");
+        }
+
+        form.reset();
+        barcodeSvg.removeAttribute("data-value");
+        barcodeSvg.innerHTML = "";
+        generateBtn.disabled = false;
+        generateBtn.textContent = "Generate Barcode";
+        imageInput.value = "";
+        previewImg.src = "";
+        imagePreview.style.display = "none";
+        removeImageBtn.style.display = "none";
+        imageFileToUpload = null;
+        currentImageUrl = null;
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById("addEquipmentModal"));
+        modal.hide();
+
+        await loadEquipments();
+        await loadDashboardStats();
+      } catch (err) {
+        console.error("Error saving:", err);
+        let errorMessage = "Error saving equipment";
+        if (err.message) {
+          errorMessage = err.message;
+          // Provide more specific error messages
+          if (err.message.includes("Rate limit")) {
+            errorMessage = "Too many requests. Please wait a moment and try again.";
+          } else if (err.message.includes("Unauthorized")) {
+            errorMessage = "You don't have permission to perform this action. Please log in again.";
+          } else if (err.message.includes("Network")) {
+            errorMessage = "Network error. Please check your connection and try again.";
+          }
+        }
+        showAlert(errorMessage, "danger");
+      } finally {
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+
+    // Edit Equipment
+    async function editEquipment(id) {
+      try {
+        const data = await EquipmentAPI.getById(id);
+        if (!data) {
+          showAlert("Equipment not found", "danger");
+          return;
+        }
+      document.getElementById("equipmentId").value = id;
+      document.getElementById("equipName").value = data.name;
+      document.getElementById("equipCategory").value = data.category;
+      document.getElementById("equipStatus").value = data.status;
+      document.getElementById("equipCondition").value = data.condition;
+      document.getElementById("equipLocation").value = data.location;
+        document.getElementById("modalTitle").textContent = "Edit Equipment";
+
+        // Handle image
+        currentImageUrl = data.imageUrl || null;
+        imageFileToUpload = null;
+        if (currentImageUrl) {
+          previewImg.src = currentImageUrl;
+          imagePreview.style.display = "block";
+          removeImageBtn.style.display = "block";
+        } else {
+          previewImg.src = "";
+          imagePreview.style.display = "none";
+          removeImageBtn.style.display = "none";
+        }
+        imageInput.value = ""; // Clear file input
+
+        if (data.barcode) {
+          loadJsBarcode().then(() => {
+            if (typeof JsBarcode !== 'undefined') {
+      JsBarcode(barcodeSvg, data.barcode, { format: "CODE128" });
+            }
+      barcodeSvg.dataset.value = data.barcode;
+          });
+        }
+
+      generateBtn.style.display = "none";
+
+      const modal = new bootstrap.Modal(document.getElementById("addEquipmentModal"));
+      modal.show();
+      } catch (error) {
+        showAlert("Error loading equipment", "danger");
+      }
+    }
+
+    // Delete Equipment
+    async function deleteEquipment(id) {
+      if (confirm("Are you sure you want to delete this equipment?")) {
+        try {
+          // Get equipment data first to delete associated image
+          const data = await EquipmentAPI.getById(id);
+          if (data && data.imageUrl) {
+            await deleteImageFromStorage(data.imageUrl);
+          }
+          await EquipmentAPI.delete(id);
+          showAlert("Equipment deleted successfully!", "success");
+        await loadEquipments();
+        await loadDashboardStats();
+        } catch (error) {
+          showAlert("Error deleting equipment", "danger");
+        }
+      }
+    }
+
+    // Reset Modal on Close
+    document.getElementById("addEquipmentModal").addEventListener("hidden.bs.modal", () => {
+      form.reset();
+      barcodeSvg.removeAttribute("data-value");
+      barcodeSvg.innerHTML = "";
+      generateBtn.disabled = false;
+      generateBtn.textContent = "Generate Barcode";
+      generateBtn.style.display = "inline-block";
+      document.getElementById("equipmentId").value = "";
+      document.getElementById("modalTitle").textContent = "Add Equipment";
+    });
+
+    // Reports System - Simplified (using API data)
+    document.getElementById("generateReport").addEventListener("click", async () => {
+      const reportType = document.getElementById("reportType").value;
+      const dateFrom = document.getElementById("reportDateFrom").value;
+      const dateTo = document.getElementById("reportDateTo").value;
+
+      try {
+        let reportHTML = '';
+        
+        if (reportType === 'inventory') {
+          const equipment = await EquipmentAPI.getAll();
+          reportHTML = generateInventoryReport(equipment);
+        } else if (reportType === 'status') {
+          const equipment = await EquipmentAPI.getAll();
+          reportHTML = generateStatusReport(equipment);
+        } else if (reportType === 'borrowing') {
+          const requests = await RequestsAPI.getAll();
+          reportHTML = generateBorrowingReport(requests, dateFrom, dateTo);
+        } else if (reportType === 'borrower') {
+          const borrowers = await BorrowersAPI.getAll();
+          const requests = await RequestsAPI.getAll();
+          reportHTML = generateBorrowerReport(borrowers, requests);
+        }
+
+        document.getElementById("reportContent").innerHTML = reportHTML;
+        document.getElementById("exportReport").style.display = "inline-block";
+        showAlert("Report generated successfully!", "success");
+      } catch (error) {
+        console.error("Error generating report:", error);
+        showAlert("Error generating report", "danger");
+      }
+    });
+
+    // Export Report
+    document.getElementById("exportReport").addEventListener("click", async () => {
+      const reportType = document.getElementById("reportType").value;
+      const dateFrom = document.getElementById("reportDateFrom").value;
+      const dateTo = document.getElementById("reportDateTo").value;
+      
+      try {
+        let exportType = 'equipment';
+        if (reportType === 'borrowing') exportType = 'requests';
+        else if (reportType === 'borrower') exportType = 'borrowers';
+        else if (reportType === 'inventory' || reportType === 'status') exportType = 'equipment';
+        
+        const filters = {};
+        if (dateFrom) filters.startDate = dateFrom;
+        if (dateTo) filters.endDate = dateTo;
+        
+        await ExportAPI.exportData(exportType, 'csv', filters);
+        showAlert("Report exported successfully!", "success");
+      } catch (error) {
+        console.error("Error exporting report:", error);
+        showAlert("Error exporting report: " + error.message, "danger");
+      }
+    });
+
+    function generateInventoryReport(equipment) {
+      let html = `
+        <div class="report-card">
+          <h4 class="mb-4">Equipment Inventory Report</h4>
+          <p class="text-muted">Generated on: ${new Date().toLocaleString()}</p>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Condition</th>
+                <th>Location</th>
+                <th>Barcode</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      equipment.forEach(item => {
+        html += `
+          <tr>
+            <td>${escapeHtml(item.name || 'N/A')}</td>
+            <td>${escapeHtml(item.category || 'N/A')}</td>
+            <td>${item.status || 'N/A'}</td>
+            <td>${item.condition || 'N/A'}</td>
+            <td>${escapeHtml(item.location || 'N/A')}</td>
+            <td>${item.barcode || 'N/A'}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+          <p class="mt-3"><strong>Total Equipment:</strong> ${equipment.length}</p>
+        </div>
+      `;
+
+      return html;
+    }
+
+    function generateStatusReport(equipment) {
+      const statusCounts = { Available: 0, Borrowed: 0, 'Under Repair': 0 };
+      const conditionCounts = { Good: 0, Damaged: 0 };
+
+      equipment.forEach(item => {
+        if (statusCounts[item.status] !== undefined) statusCounts[item.status]++;
+        if (conditionCounts[item.condition] !== undefined) conditionCounts[item.condition]++;
+      });
+
+      let html = `
+        <div class="report-card">
+          <h4 class="mb-4">Equipment Status Report</h4>
+          <p class="text-muted">Generated on: ${new Date().toLocaleString()}</p>
+          
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h5>Status Breakdown</h5>
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Available</span>
+                  <span class="badge bg-success">${statusCounts.Available}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Borrowed</span>
+                  <span class="badge bg-warning">${statusCounts.Borrowed}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Under Repair</span>
+                  <span class="badge bg-danger">${statusCounts['Under Repair']}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h5>Condition Breakdown</h5>
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Good</span>
+                  <span class="badge bg-success">${conditionCounts.Good}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Damaged</span>
+                  <span class="badge bg-danger">${conditionCounts.Damaged}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <p><strong>Total Equipment:</strong> ${equipment.length}</p>
+        </div>
+      `;
+
+      return html;
+    }
+
+    function generateBorrowingReport(requests, dateFrom, dateTo) {
+      // Filter by date if provided
+      let filtered = requests;
+      if (dateFrom || dateTo) {
+        filtered = requests.filter(req => {
+          if (!req.timestamp) return false;
+          const reqDate = new Date(req.timestamp);
+          if (dateFrom && reqDate < new Date(dateFrom)) return false;
+          if (dateTo) {
+            const toDate = new Date(dateTo);
+            toDate.setHours(23, 59, 59);
+            if (reqDate > toDate) return false;
+          }
+          return true;
+        });
+      }
+      
+      let html = `
+        <div class="report-card">
+          <h4 class="mb-4">Borrowing Activity Report</h4>
+          <p class="text-muted">Generated on: ${new Date().toLocaleString()}</p>
+          ${dateFrom || dateTo ? `<p>Date Range: ${dateFrom || 'Start'} to ${dateTo || 'End'}</p>` : ''}
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Borrower ID</th>
+                <th>Equipment</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      if (filtered.length === 0) {
+        html += '<tr><td colspan="4" class="text-center">No borrowing activity found</td></tr>';
+      } else {
+        filtered.forEach(req => {
+          const date = req.timestamp ? new Date(req.timestamp).toLocaleDateString() : 'N/A';
+          html += `
+            <tr>
+              <td>${escapeHtml(req.borrowerId || 'Unknown')}</td>
+              <td>${escapeHtml(req.equipmentName || 'N/A')}</td>
+              <td>${req.status || 'Pending'}</td>
+              <td>${date}</td>
+            </tr>
+          `;
+        });
+      }
+
+      html += `
+            </tbody>
+          </table>
+          <p class="mt-3"><strong>Total Requests:</strong> ${filtered.length}</p>
+        </div>
+      `;
+
+      return html;
+    }
+
+    function generateBorrowerReport(borrowers, requests) {
+      const borrowerActivity = {};
+      
+      requests.forEach(req => {
+        const borrowerId = req.borrowerId;
+        if (borrowerId) {
+          if (!borrowerActivity[borrowerId]) {
+            borrowerActivity[borrowerId] = { total: 0, pending: 0, approved: 0, rejected: 0 };
+          }
+          borrowerActivity[borrowerId].total++;
+          const status = (req.status || '').toLowerCase();
+          if (status.includes('pending')) borrowerActivity[borrowerId].pending++;
+          if (status.includes('approved') || status.includes('active')) borrowerActivity[borrowerId].approved++;
+          if (status.includes('rejected') || status.includes('denied')) borrowerActivity[borrowerId].rejected++;
+        }
+      });
+
+      let html = `
+        <div class="report-card">
+          <h4 class="mb-4">Borrower Activity Report</h4>
+          <p class="text-muted">Generated on: ${new Date().toLocaleString()}</p>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Borrower ID</th>
+                <th>Total Requests</th>
+                <th>Pending</th>
+                <th>Approved</th>
+                <th>Rejected</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      if (Object.keys(borrowerActivity).length === 0) {
+        html += '<tr><td colspan="5" class="text-center">No borrower activity found</td></tr>';
+      } else {
+        const sorted = Object.entries(borrowerActivity)
+          .sort((a, b) => b[1].total - a[1].total);
+        
+        sorted.forEach(([borrowerId, stats]) => {
+          html += `
+            <tr>
+              <td>${escapeHtml(borrowerId)}</td>
+              <td>${stats.total}</td>
+              <td>${stats.pending}</td>
+              <td>${stats.approved}</td>
+              <td>${stats.rejected}</td>
+            </tr>
+          `;
+        });
+      }
+
+      html += `
+            </tbody>
+          </table>
+          <p class="mt-3"><strong>Total Active Borrowers:</strong> ${borrowers.length}</p>
+        </div>
+      `;
+
+      return html;
+    }
+
+    // ============================================
+    // REQUEST MANAGEMENT SYSTEM
+    // ============================================
+
+    // Load Requests
+    async function loadRequests() {
+      const requestsTableBody = document.getElementById("requestsTableBody");
+      const requestsLoading = document.getElementById("requestsLoading");
+      
+      if (requestsLoading) requestsLoading.style.display = "block";
+      if (requestsTableBody) requestsTableBody.innerHTML = "";
+
+      try {
+        allRequests = await RequestsAPI.getAll();
+        
+        // Sort by timestamp (newest first)
+        allRequests.sort((a, b) => {
+          const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+          const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+          return timeB - timeA;
+        });
+
+        filterRequests();
+        updatePendingRequestsBadge();
+      } catch (error) {
+        console.error("Error loading requests:", error);
+        showAlert("Error loading requests", "danger");
+      } finally {
+        if (requestsLoading) requestsLoading.style.display = "none";
+      }
+    }
+
+    // Filter Requests
+    function filterRequests() {
+      const searchTerm = document.getElementById("searchRequests")?.value.toLowerCase() || "";
+      const statusFilter = document.getElementById("filterRequestStatus")?.value || "";
+      const dateFrom = document.getElementById("filterRequestDateFrom")?.value || "";
+      const dateTo = document.getElementById("filterRequestDateTo")?.value || "";
+
+      filteredRequests = allRequests.filter(request => {
+        const matchesSearch = !searchTerm || 
+          request.borrowerId?.toLowerCase().includes(searchTerm) ||
+          request.equipmentName?.toLowerCase().includes(searchTerm);
+        
+        const matchesStatus = !statusFilter || 
+          request.status?.toLowerCase() === statusFilter.toLowerCase();
+        
+        let matchesDate = true;
+        if (request.timestamp) {
+          const requestDate = new Date(request.timestamp);
+          if (dateFrom) {
+            const fromDate = new Date(dateFrom);
+            fromDate.setHours(0, 0, 0, 0);
+            if (requestDate < fromDate) matchesDate = false;
+          }
+          if (dateTo) {
+            const toDate = new Date(dateTo);
+            toDate.setHours(23, 59, 59, 999);
+            if (requestDate > toDate) matchesDate = false;
+          }
+        }
+
+        return matchesSearch && matchesStatus && matchesDate;
+      });
+
+      displayRequests();
+    }
+
+    // Display Requests
+    function displayRequests() {
+      const requestsTableBody = document.getElementById("requestsTableBody");
+      if (!requestsTableBody) return;
+      
+      if (filteredRequests.length === 0) {
+        requestsTableBody.innerHTML = '<tr><td colspan="8" class="text-center"><div class="empty-state"><i class="bi bi-inbox"></i><p>No requests found</p></div></td></tr>';
+        return;
+      }
+
+      let html = "";
+      filteredRequests.forEach(request => {
+        // Handle timestamp
+        let date = 'N/A';
+        if (request.timestamp) {
+          date = new Date(request.timestamp).toLocaleDateString();
+        }
+        
+        const status = request.status?.toLowerCase() || 'pending';
+        const statusBadge = getRequestStatusBadge(request.status);
+        const isChecked = selectedRequestIds.includes(request.id) ? 'checked' : '';
+        const isOverdue = request.returnDate && new Date(request.returnDate) < new Date() && status === 'approved';
+
+        html += `
+          <tr class="${isOverdue ? 'table-warning' : ''}">
+            <td>
+              <input type="checkbox" class="form-check-input request-checkbox" value="${request.id}" ${isChecked} ${status !== 'pending' ? 'disabled' : ''}>
+            </td>
+            <td>${escapeHtml(request.borrowerId || 'Unknown')}</td>
+            <td>${escapeHtml(request.equipmentName || 'N/A')}</td>
+            <td>${escapeHtml(request.purpose || 'N/A')}</td>
+            <td>
+              ${request.requestDate ? escapeHtml(request.requestDate) : (request.timestamp ? new Date(request.timestamp).toLocaleDateString() : 'N/A')}
+              ${request.startTime && request.endTime ? `<br><small class="text-muted"><i class="bi bi-clock"></i> ${formatTime(request.startTime)} - ${formatTime(request.endTime)}</small>` : ''}
+            </td>
+            <td>
+              ${getReturnDate(request)}
+              ${request.returnedAt ? `<br><small class="text-muted"><i class="bi bi-clock-history"></i> Returned: ${formatTimeOnly(request.returnedAt)}</small>` : ''}
+              ${isOverdue ? '<br><span class="badge bg-danger">Overdue</span>' : ''}
+            </td>
+            <td>${statusBadge}</td>
+            <td>
+              <button class="btn btn-sm btn-info me-1" onclick="viewRequestDetails('${request.id}')">
+                <i class="bi bi-eye"></i> View
+              </button>
+              ${status === 'pending' ? `
+                <button class="btn btn-sm btn-success me-1" onclick="approveRequest('${request.id}')">
+                  <i class="bi bi-check-circle"></i> Approve
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="rejectRequest('${request.id}')">
+                  <i class="bi bi-x-circle"></i> Reject
+                </button>
+              ` : ''}
+              ${status === 'approved' ? `
+                <button class="btn btn-sm btn-primary" onclick="returnEquipment('${request.id}', '${request.equipmentId}')">
+                  <i class="bi bi-box-arrow-in-left"></i> Return
+                </button>
+              ` : ''}
+              ${status === 'cancelled' ? `
+                <span class="text-muted"><small>Cancelled by borrower</small></span>
+              ` : ''}
+            </td>
+          </tr>
+        `;
+      });
+
+      requestsTableBody.innerHTML = html;
+      updateBatchButtons();
+    }
+
+    // Get Request Status Badge
+    function getRequestStatusBadge(status) {
+      const statusLower = (status || 'pending').toLowerCase();
+      let badgeClass = 'bg-secondary';
+      if (statusLower.includes('approved')) badgeClass = 'bg-success';
+      else if (statusLower.includes('pending')) badgeClass = 'bg-warning';
+      else if (statusLower.includes('rejected') || statusLower.includes('cancelled')) badgeClass = 'bg-danger';
+      else if (statusLower.includes('returned')) badgeClass = 'bg-info';
+      return `<span class="badge ${badgeClass} badge-status">${status || 'Pending'}</span>`;
+    }
+
+    // View Request Details
+    async function viewRequestDetails(requestId) {
+      try {
+        const request = await RequestsAPI.getById(requestId);
+        if (!request) {
+          showAlert("Request not found", "danger");
+          return;
+        }
+
+        const borrowerData = await BorrowersAPI.getById(request.borrowerId).catch(() => null);
+        const equipmentData = await EquipmentAPI.getById(request.equipmentId).catch(() => null);
+
+        const requestDate = request.requestDate ? escapeHtml(request.requestDate) : (request.timestamp ? new Date(request.timestamp).toLocaleDateString() : 'N/A');
+        const statusBadge = getRequestStatusBadge(request.status);
+
+        const html = `
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Request Information</h6>
+              <table class="table table-bordered">
+                <tr><th>Request ID:</th><td>${requestId}</td></tr>
+                <tr><th>Status:</th><td>${statusBadge}</td></tr>
+                <tr><th>Request Date:</th><td>${requestDate} ${request.startTime && request.endTime ? `<br><small class="text-muted"><i class="bi bi-clock"></i> ${formatTime(request.startTime)} - ${formatTime(request.endTime)}</small>` : ''}</td></tr>
+                <tr><th>Return Date:</th><td>${getReturnDate(request)} ${request.returnedAt ? `<br><small class="text-muted"><i class="bi bi-clock-history"></i> Returned: ${formatTimeOnly(request.returnedAt)}</small>` : ''}</td></tr>
+                <tr><th>Purpose:</th><td>${escapeHtml(request.purpose || 'N/A')}</td></tr>
+                ${request.adminComment ? `<tr><th>Admin Comment:</th><td>${escapeHtml(request.adminComment)}</td></tr>` : ''}
+                ${request.status?.toLowerCase().includes('cancelled') && request.cancellationComment ? `<tr><th>Cancellation Reason:</th><td>${escapeHtml(request.cancellationComment)}</td></tr>` : ''}
+                ${request.status?.toLowerCase().includes('cancelled') && request.cancelledAt ? `<tr><th>Cancelled At:</th><td>${new Date(request.cancelledAt).toLocaleString()}</td></tr>` : ''}
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h6>Borrower Information</h6>
+              <table class="table table-bordered">
+                <tr><th>Student ID:</th><td>${escapeHtml(request.borrowerId || 'N/A')}</td></tr>
+                <tr><th>Name:</th><td>${escapeHtml(borrowerData?.name || 'N/A')}</td></tr>
+                <tr><th>Email:</th><td>${escapeHtml(borrowerData?.email || 'N/A')}</td></tr>
+                <tr><th>Course:</th><td>${escapeHtml(borrowerData?.course || 'N/A')}</td></tr>
+              </table>
+              <h6 class="mt-3">Equipment Information</h6>
+              <table class="table table-bordered">
+                <tr><th>Equipment Name:</th><td>${escapeHtml(request.equipmentName || 'N/A')}</td></tr>
+                <tr><th>Category:</th><td>${escapeHtml(equipmentData?.category || 'N/A')}</td></tr>
+                <tr><th>Status:</th><td>${equipmentData?.status || 'N/A'}</td></tr>
+                <tr><th>Location:</th><td>${escapeHtml(equipmentData?.location || 'N/A')}</td></tr>
+              </table>
+            </div>
+          </div>
+        `;
+
+        document.getElementById("requestDetailsContent").innerHTML = html;
+        new bootstrap.Modal(document.getElementById("requestDetailsModal")).show();
+      } catch (error) {
+        console.error("Error loading request details:", error);
+        showAlert("Error loading request details", "danger");
+      }
+    }
+
+    // Approve Request
+    function approveRequest(requestId) {
+      document.getElementById("requestActionId").value = requestId;
+      document.getElementById("requestActionType").value = "approve";
+      document.getElementById("approveRejectModalTitle").textContent = "Approve Request";
+      document.getElementById("adminComment").value = "";
+      new bootstrap.Modal(document.getElementById("approveRejectModal")).show();
+    }
+
+    // Reject Request
+    function rejectRequest(requestId) {
+      document.getElementById("requestActionId").value = requestId;
+      document.getElementById("requestActionType").value = "reject";
+      document.getElementById("approveRejectModalTitle").textContent = "Reject Request";
+      document.getElementById("adminComment").value = "";
+      new bootstrap.Modal(document.getElementById("approveRejectModal")).show();
+    }
+
+    // Confirm Request Action (Approve/Reject)
+    const confirmRequestActionBtn = document.getElementById("confirmRequestAction");
+    if (confirmRequestActionBtn) {
+      confirmRequestActionBtn.addEventListener("click", async () => {
+        const requestId = document.getElementById("requestActionId").value;
+        const actionType = document.getElementById("requestActionType").value;
+        const adminComment = document.getElementById("adminComment").value;
+
+        try {
+          if (actionType === "approve") {
+            await RequestsAPI.approve(requestId, adminComment);
+            showAlert("Request approved successfully!", "success");
+          } else {
+            await RequestsAPI.reject(requestId, adminComment);
+            showAlert("Request rejected successfully!", "success");
+          }
+          
+          bootstrap.Modal.getInstance(document.getElementById("approveRejectModal")).hide();
+          await loadRequests();
+      await loadDashboardStats();
+      await loadEquipments();
+          updatePendingRequestsBadge();
+        } catch (error) {
+          console.error("Error processing request:", error);
+          // Show the actual error message from API
+          const errorMessage = error.message || "Error processing request";
+          showAlert(errorMessage, "danger");
+        }
+      });
+    }
+
+    // Return Equipment
+    function returnEquipment(requestId, equipmentId) {
+      document.getElementById("returnRequestId").value = requestId;
+      document.getElementById("returnEquipmentId").value = equipmentId;
+      document.getElementById("returnCondition").value = "Good";
+      document.getElementById("returnNotes").value = "";
+      new bootstrap.Modal(document.getElementById("returnEquipmentModal")).show();
+    }
+
+    // Confirm Return Equipment
+    const confirmReturnEquipmentBtn = document.getElementById("confirmReturnEquipment");
+    if (confirmReturnEquipmentBtn) {
+      confirmReturnEquipmentBtn.addEventListener("click", async () => {
+        const requestId = document.getElementById("returnRequestId").value;
+        const returnCondition = document.getElementById("returnCondition").value;
+        const returnNotes = document.getElementById("returnNotes").value;
+
+        try {
+          await RequestsAPI.return(requestId, returnCondition, returnNotes);
+          showAlert("Equipment returned successfully!", "success");
+          bootstrap.Modal.getInstance(document.getElementById("returnEquipmentModal")).hide();
+          await loadRequests();
+          await loadDashboardStats();
+          await loadEquipments();
+        } catch (error) {
+          console.error("Error returning equipment:", error);
+          showAlert("Error returning equipment", "danger");
+        }
+      });
+    }
+
+    // Batch Operations
+    const selectAllRequestsCheckbox = document.getElementById("selectAllRequests");
+    if (selectAllRequestsCheckbox) {
+      selectAllRequestsCheckbox.addEventListener("change", (e) => {
+        const checkboxes = document.querySelectorAll(".request-checkbox:not(:disabled)");
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = e.target.checked;
+          if (e.target.checked) {
+            if (!selectedRequestIds.includes(checkbox.value)) {
+              selectedRequestIds.push(checkbox.value);
+            }
+          } else {
+            selectedRequestIds = selectedRequestIds.filter(id => id !== checkbox.value);
+          }
+        });
+        updateBatchButtons();
+      });
+    }
+
+    document.addEventListener("change", (e) => {
+      if (e.target.classList.contains("request-checkbox")) {
+        if (e.target.checked) {
+          if (!selectedRequestIds.includes(e.target.value)) {
+            selectedRequestIds.push(e.target.value);
+          }
+        } else {
+          selectedRequestIds = selectedRequestIds.filter(id => id !== e.target.value);
+        }
+        updateBatchButtons();
+      }
+    });
+
+    function updateBatchButtons() {
+      const batchApproveBtn = document.getElementById("batchApproveBtn");
+      const batchRejectBtn = document.getElementById("batchRejectBtn");
+      const selectAllCheckbox = document.getElementById("selectAllRequests");
+
+      if (selectedRequestIds.length > 0) {
+        if (batchApproveBtn) batchApproveBtn.style.display = "inline-block";
+        if (batchRejectBtn) batchRejectBtn.style.display = "inline-block";
+      } else {
+        if (batchApproveBtn) batchApproveBtn.style.display = "none";
+        if (batchRejectBtn) batchRejectBtn.style.display = "none";
+      }
+
+      if (selectAllCheckbox) {
+        const enabledCheckboxes = document.querySelectorAll(".request-checkbox:not(:disabled)");
+        selectAllCheckbox.checked = enabledCheckboxes.length > 0 && 
+          Array.from(enabledCheckboxes).every(cb => cb.checked);
+      }
+    }
+
+    const batchApproveBtn = document.getElementById("batchApproveBtn");
+    if (batchApproveBtn) {
+      batchApproveBtn.addEventListener("click", async () => {
+        if (selectedRequestIds.length === 0) return;
+        if (!confirm(`Approve ${selectedRequestIds.length} request(s)?`)) return;
+
+        try {
+          batchApproveBtn.disabled = true;
+          batchApproveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+          
+          // Filter to only pending requests
+          const pendingIds = [];
+          for (const requestId of selectedRequestIds) {
+            const request = await RequestsAPI.getById(requestId).catch(() => null);
+            if (request && request.status === "pending") {
+              pendingIds.push(requestId);
+            }
+          }
+          
+          if (pendingIds.length > 0) {
+            const result = await BulkOperationsAPI.bulkApproveRequests(pendingIds);
+            showAlert(`${result.successCount} request(s) approved successfully!${result.failedCount > 0 ? ` ${result.failedCount} failed.` : ''}`, result.failedCount > 0 ? "warning" : "success");
+          } else {
+            showAlert("No pending requests selected", "warning");
+          }
+
+          selectedRequestIds = [];
+          batchApproveBtn.disabled = false;
+          batchApproveBtn.innerHTML = '<i class="bi bi-check-circle"></i> Approve Selected';
+          await loadRequests();
+          await loadDashboardStats();
+          await loadEquipments();
+          updatePendingRequestsBadge();
+        } catch (error) {
+          console.error("Error batch approving requests:", error);
+          showAlert("Error approving requests: " + error.message, "danger");
+          batchApproveBtn.disabled = false;
+          batchApproveBtn.innerHTML = '<i class="bi bi-check-circle"></i> Approve Selected';
+        }
+      });
+    }
+
+    const batchRejectBtn = document.getElementById("batchRejectBtn");
+    if (batchRejectBtn) {
+      batchRejectBtn.addEventListener("click", async () => {
+        if (selectedRequestIds.length === 0) return;
+        const adminComment = prompt(`Reject ${selectedRequestIds.length} request(s)?\n\nOptional comment:`) || 'Bulk rejection';
+        if (adminComment === null) return; // User cancelled
+
+        try {
+          batchRejectBtn.disabled = true;
+          batchRejectBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+          
+          // Filter to only pending requests
+          const pendingIds = [];
+          for (const requestId of selectedRequestIds) {
+            const request = await RequestsAPI.getById(requestId).catch(() => null);
+            if (request && request.status === "pending") {
+              pendingIds.push(requestId);
+            }
+          }
+          
+          if (pendingIds.length > 0) {
+            const result = await BulkOperationsAPI.bulkRejectRequests(pendingIds, adminComment);
+            showAlert(`${result.successCount} request(s) rejected successfully!${result.failedCount > 0 ? ` ${result.failedCount} failed.` : ''}`, result.failedCount > 0 ? "warning" : "success");
+          } else {
+            showAlert("No pending requests selected", "warning");
+          }
+
+          selectedRequestIds = [];
+          batchRejectBtn.disabled = false;
+          batchRejectBtn.innerHTML = '<i class="bi bi-x-circle"></i> Reject Selected';
+          await loadRequests();
+          await loadDashboardStats();
+          updatePendingRequestsBadge();
+        } catch (error) {
+          console.error("Error batch rejecting requests:", error);
+          showAlert("Error rejecting requests: " + error.message, "danger");
+          batchRejectBtn.disabled = false;
+          batchRejectBtn.innerHTML = '<i class="bi bi-x-circle"></i> Reject Selected';
+        }
+      });
+    }
+
+    // Request Filters
+    const searchRequestsInput = document.getElementById("searchRequests");
+    if (searchRequestsInput) searchRequestsInput.addEventListener("input", filterRequests);
+    const filterRequestStatusSelect = document.getElementById("filterRequestStatus");
+    if (filterRequestStatusSelect) filterRequestStatusSelect.addEventListener("change", filterRequests);
+    const filterRequestDateFromInput = document.getElementById("filterRequestDateFrom");
+    if (filterRequestDateFromInput) filterRequestDateFromInput.addEventListener("change", filterRequests);
+    const filterRequestDateToInput = document.getElementById("filterRequestDateTo");
+    if (filterRequestDateToInput) filterRequestDateToInput.addEventListener("change", filterRequests);
+    const clearRequestFiltersBtn = document.getElementById("clearRequestFilters");
+    if (clearRequestFiltersBtn) {
+      clearRequestFiltersBtn.addEventListener("click", () => {
+        if (searchRequestsInput) searchRequestsInput.value = "";
+        if (filterRequestStatusSelect) filterRequestStatusSelect.value = "";
+        if (filterRequestDateFromInput) filterRequestDateFromInput.value = "";
+        if (filterRequestDateToInput) filterRequestDateToInput.value = "";
+        filterRequests();
+      });
+    }
+
+    // Update Pending Requests Badge
+    async function updatePendingRequestsBadge() {
+      try {
+        const pending = allRequests.filter(r => r.status?.toLowerCase() === 'pending');
+        const pendingCount = pending.length;
+        const badge = document.getElementById("pendingRequestsBadge");
+        
+        if (pendingCount > 0 && badge) {
+          badge.textContent = pendingCount;
+          badge.style.display = "inline-block";
+        } else if (badge) {
+          badge.style.display = "none";
+        }
+      } catch (error) {
+        console.error("Error updating pending requests badge:", error);
+      }
+    }
+
+    // ============================================
+    // BORROWER MANAGEMENT
+    // ============================================
+
+    // Load Borrowers
+    async function loadBorrowers() {
+      const borrowersTableBody = document.getElementById("borrowersTableBody");
+      const borrowersLoading = document.getElementById("borrowersLoading");
+      
+      if (borrowersLoading) borrowersLoading.style.display = "block";
+      if (borrowersTableBody) borrowersTableBody.innerHTML = "";
+
+      try {
+        const search = document.getElementById("searchBorrowers")?.value || null;
+        allBorrowers = await BorrowersAPI.getAll(search);
+        filterBorrowers();
+      } catch (error) {
+        console.error("Error loading borrowers:", error);
+        showAlert("Error loading borrowers", "danger");
+      } finally {
+        if (borrowersLoading) borrowersLoading.style.display = "none";
+      }
+    }
+
+    // Filter Borrowers
+    function filterBorrowers() {
+      const searchTerm = document.getElementById("searchBorrowers")?.value.toLowerCase() || "";
+      
+      filteredBorrowers = allBorrowers.filter(borrower => {
+        return !searchTerm ||
+          borrower.id?.toLowerCase().includes(searchTerm) ||
+          borrower.name?.toLowerCase().includes(searchTerm) ||
+          borrower.email?.toLowerCase().includes(searchTerm) ||
+          borrower.course?.toLowerCase().includes(searchTerm);
+      });
+
+      displayBorrowers();
+    }
+
+    // Display Borrowers
+    function displayBorrowers() {
+      const borrowersTableBody = document.getElementById("borrowersTableBody");
+      if (!borrowersTableBody) return;
+      
+      if (filteredBorrowers.length === 0) {
+        borrowersTableBody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="empty-state"><i class="bi bi-people"></i><p>No borrowers found</p></div></td></tr>';
+        return;
+      }
+
+      let html = "";
+      filteredBorrowers.forEach((borrower, index) => {
+        html += `
+          <tr style="border-bottom: 1px solid #f1f5f9; transition: all 0.2s ease;" 
+              onmouseover="this.style.background='#f8fafc'; this.style.transform='scale(1.01)';" 
+              onmouseout="this.style.background='white'; this.style.transform='scale(1)';">
+            <td style="padding: 16px; font-weight: 600; color: #1e293b;">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width: 6px; height: 6px; border-radius: 50%; background: #3b82f6;"></div>
+                ${escapeHtml(borrower.id)}
+              </div>
+            </td>
+            <td style="padding: 16px; font-weight: 500; color: #334155;">${escapeHtml(borrower.name || 'N/A')}</td>
+            <td style="padding: 16px; color: #64748b; font-size: 14px;">${escapeHtml(borrower.email || 'N/A')}</td>
+            <td style="padding: 16px; color: #475569;">
+              <span class="badge bg-light text-dark" style="font-weight: 500; padding: 6px 12px; border-radius: 6px;">${escapeHtml(borrower.course || 'N/A')}</span>
+            </td>
+            <td style="padding: 16px; color: #475569;">
+              <span class="badge bg-light text-dark" style="font-weight: 500; padding: 6px 12px; border-radius: 6px;">${escapeHtml(borrower.yearLevel || 'N/A')}</span>
+            </td>
+            <td style="padding: 16px;">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">
+                  ${borrower.totalRequests || 0}
+                </div>
+              </div>
+            </td>
+            <td style="padding: 16px;">
+              <button class="btn btn-sm btn-info" onclick="viewBorrowerDetails('${borrower.id}')" 
+                      style="border-radius: 8px; padding: 8px 16px; font-weight: 500; transition: all 0.2s ease;"
+                      onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)';"
+                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <i class="bi bi-eye me-1"></i> View
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      borrowersTableBody.innerHTML = html;
+    }
+
+    // View Borrower Details
+    async function viewBorrowerDetails(borrowerId) {
+      try {
+        const borrowerData = await BorrowersAPI.getById(borrowerId);
+        if (!borrowerData) {
+          showAlert("Borrower not found", "danger");
+          return;
+        }
+
+        let requestsHtml = "";
+        const requests = borrowerData.requests || [];
+        if (requests.length === 0) {
+          requestsHtml = "<p class='text-muted'>No requests found</p>";
+        } else {
+          requestsHtml = "<table class='table table-bordered'><thead><tr><th>Equipment</th><th>Status</th><th>Date</th></tr></thead><tbody>";
+          requests.forEach(req => {
+            const date = req.timestamp ? new Date(req.timestamp).toLocaleDateString() : 'N/A';
+            requestsHtml += `<tr><td>${escapeHtml(req.equipmentName || 'N/A')}</td><td>${getRequestStatusBadge(req.status)}</td><td>${date}</td></tr>`;
+          });
+          requestsHtml += "</tbody></table>";
+        }
+
+        const html = `
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Profile Information</h6>
+              <table class="table table-bordered">
+                <tr><th>Student ID:</th><td>${escapeHtml(borrowerId)}</td></tr>
+                <tr><th>Name:</th><td>${escapeHtml(borrowerData.name || 'N/A')}</td></tr>
+                <tr><th>Email:</th><td>${escapeHtml(borrowerData.email || 'N/A')}</td></tr>
+                <tr><th>Course:</th><td>${escapeHtml(borrowerData.course || 'N/A')}</td></tr>
+                <tr><th>Year Level:</th><td>${escapeHtml(borrowerData.yearLevel || 'N/A')}</td></tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h6>Borrowing History</h6>
+              ${requestsHtml}
+            </div>
+          </div>
+        `;
+
+        document.getElementById("borrowerDetailsContent").innerHTML = html;
+        new bootstrap.Modal(document.getElementById("borrowerDetailsModal")).show();
+      } catch (error) {
+        console.error("Error loading borrower details:", error);
+        showAlert("Error loading borrower details", "danger");
+      }
+    }
+
+    // Note: Borrower editing is removed per user request - only view is available
+
+    // Borrower Search
+    const searchBorrowersInput = document.getElementById("searchBorrowers");
+    if (searchBorrowersInput) {
+      searchBorrowersInput.addEventListener("input", () => {
+        loadBorrowers(); // Reload with search filter
+      });
+    }
+
+    // ============================================
+    // EQUIPMENT HISTORY & TRACKING
+    // ============================================
+
+    // View Equipment History
+    async function viewEquipmentHistory(equipmentId) {
+      try {
+        const historyData = await HistoryAPI.getEquipmentHistory(equipmentId);
+        if (!historyData) {
+          showAlert("Equipment not found", "danger");
+          return;
+        }
+
+        const equipment = historyData.equipment;
+        const history = historyData.history || [];
+
+        let historyHtml = "";
+        if (history.length === 0) {
+          historyHtml = "<p class='text-muted'>No borrowing history found</p>";
+        } else {
+          historyHtml = "<table class='table table-bordered'><thead><tr><th>Borrower ID</th><th>Action</th><th>Date</th><th>Notes</th></tr></thead><tbody>";
+          history.forEach(item => {
+            const date = item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A';
+            const actionBadge = item.action === 'borrowed' 
+              ? '<span class="badge bg-warning">Borrowed</span>' 
+              : '<span class="badge bg-success">Returned</span>';
+            historyHtml += `
+              <tr>
+                <td>${escapeHtml(item.borrowerId || 'N/A')}</td>
+                <td>${actionBadge}</td>
+                <td>${date}</td>
+                <td>${escapeHtml(item.notes || item.condition || 'N/A')}</td>
+              </tr>
+            `;
+          });
+          historyHtml += "</tbody></table>";
+        }
+
+        const html = `
+          <div>
+            <h6>Equipment: ${escapeHtml(equipment.name || 'Unknown')}</h6>
+            <p class="text-muted">Borrowing History</p>
+            ${historyHtml}
+          </div>
+        `;
+
+        document.getElementById("equipmentHistoryContent").innerHTML = html;
+        new bootstrap.Modal(document.getElementById("equipmentHistoryModal")).show();
+      } catch (error) {
+        console.error("Error loading equipment history:", error);
+        showAlert("Error loading equipment history", "danger");
+      }
+    }
+
+    // ============================================
+    // NOTIFICATIONS SYSTEM
+    // ============================================
+
+    // Load Notifications
+    async function loadNotifications() {
+      try {
+        notifications = await NotificationsAPI.getAll();
+        displayNotifications();
+        updateNotificationBadge();
+      } catch (error) {
+        console.error("Error loading notifications:", error);
+      }
+    }
+
+    // Display Notifications
+    function displayNotifications() {
+      const notificationsList = document.getElementById("notificationsList");
+      if (!notificationsList) return;
+
+      if (notifications.length === 0) {
+        notificationsList.innerHTML = '<div class="notification-item"><p class="text-muted text-center mb-0">No notifications</p></div>';
+        return;
+      }
+
+      let html = "";
+      notifications.forEach(notification => {
+        const date = notification.timestamp 
+          ? new Date(notification.timestamp).toLocaleString() 
+          : 'Just now';
+        
+        let message = "";
+        let data = {};
+        try {
+          data = typeof notification.data === 'string' ? JSON.parse(notification.data) : notification.data;
+        } catch (e) {
+          data = notification.data || {};
+        }
+        
+        if (notification.type === "pending_requests") {
+          message = `${data.count || 0} pending request(s) need review`;
+        } else if (notification.type === "request_approved") {
+          message = `Your request for ${data.equipmentName || 'equipment'} has been approved`;
+        } else if (notification.type === "request_rejected") {
+          message = `Your request for ${data.equipmentName || 'equipment'} has been rejected`;
+        } else if (notification.type === "request_cancelled") {
+          message = `Request for ${data.equipmentName || 'equipment'} was cancelled by borrower ${data.borrowerId || ''}`;
+        } else if (notification.type === "equipment_returned") {
+          message = `Equipment ${data.equipmentName || 'equipment'} has been returned`;
+        } else {
+          message = "New notification";
+        }
+
+        html += `
+          <div class="notification-item ${notification.read ? '' : 'unread'}" onclick="handleNotificationClick('${notification.id}')">
+            <p class="mb-1">${escapeHtml(message)}</p>
+            <small class="notification-time">${date}</small>
+          </div>
+        `;
+      });
+
+      notificationsList.innerHTML = html;
+    }
+
+    // Handle Notification Click
+    async function handleNotificationClick(notificationId) {
+      if (notificationId === "pending_requests") {
+        switchSection("requests");
+        const dropdown = document.getElementById("notificationsDropdown");
+        if (dropdown) {
+          dropdown.classList.remove("show");
+          dropdown.style.display = "none";
+        }
+        return;
+      }
+
+      try {
+        await NotificationsAPI.markAsRead(notificationId);
+        await loadNotifications();
+      } catch (error) {
+        console.error("Error updating notification:", error);
+      }
+    }
+
+    // Update Notification Badge
+    function updateNotificationBadge() {
+      const badge = document.getElementById("notificationBadge");
+      if (!badge) return;
+
+      const unreadCount = notifications.filter(n => !n.read).length;
+      if (unreadCount > 0) {
+        badge.textContent = unreadCount;
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+
+    // Notification Icon Click
+    const notificationIcon = document.getElementById("notificationIcon");
+    if (notificationIcon) {
+      notificationIcon.addEventListener("click", (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const dropdown = document.getElementById("notificationsDropdown");
+        if (dropdown) {
+          // Toggle dropdown visibility
+          if (dropdown.classList.contains("show")) {
+            dropdown.classList.remove("show");
+            dropdown.style.display = "none";
+          } else {
+            dropdown.classList.add("show");
+            dropdown.style.display = "block";
+            loadNotifications(); // Load notifications when opening
+          }
+        }
+      });
+    }
+
+    // Close notifications when clicking outside
+    document.addEventListener("click", (e) => {
+      const dropdown = document.getElementById("notificationsDropdown");
+      const icon = document.getElementById("notificationIcon");
+      const iconWrapper = document.querySelector(".notification-icon-wrapper");
+      
+      if (dropdown && icon) {
+        // Check if click is outside both icon and dropdown
+        if (!dropdown.contains(e.target) && !icon.contains(e.target) && (!iconWrapper || !iconWrapper.contains(e.target))) {
+          dropdown.classList.remove("show");
+          dropdown.style.display = "none";
+        }
+      }
+    });
+
+    // Mark All as Read
+    const markAllReadBtn = document.getElementById("markAllReadBtn");
+    if (markAllReadBtn) {
+      markAllReadBtn.addEventListener("click", async (e) => {
+        e.stopPropagation(); // Prevent dropdown from closing
+        try {
+          await NotificationsAPI.markAllAsRead();
+          showAlert("All notifications marked as read", "success");
+          await loadNotifications();
+          updateNotificationBadge();
+        } catch (error) {
+          console.error("Error marking notifications as read:", error);
+          showAlert("Error marking notifications as read: " + error.message, "danger");
+        }
+      });
+    }
+
+    // ============================================
+    // BULK OPERATIONS FOR EQUIPMENT
+    // ============================================
+    
+    let selectedEquipmentIds = [];
+    
+    // Select All Equipment Checkbox
+    const selectAllEquipment = document.getElementById("selectAllEquipment");
+    if (selectAllEquipment) {
+      selectAllEquipment.addEventListener("change", (e) => {
+        const checkboxes = document.querySelectorAll(".equipment-checkbox");
+        checkboxes.forEach(cb => {
+          cb.checked = e.target.checked;
+          const equipmentId = cb.dataset.equipmentId;
+          if (e.target.checked) {
+            if (!selectedEquipmentIds.includes(equipmentId)) {
+              selectedEquipmentIds.push(equipmentId);
+            }
+          } else {
+            selectedEquipmentIds = selectedEquipmentIds.filter(id => id !== equipmentId);
+          }
+        });
+        updateBulkActionsButton();
+      });
+    }
+    
+    // Individual Equipment Checkbox Handler
+    document.addEventListener("change", (e) => {
+      if (e.target.classList.contains("equipment-checkbox")) {
+        const equipmentId = e.target.dataset.equipmentId;
+        if (e.target.checked) {
+          if (!selectedEquipmentIds.includes(equipmentId)) {
+            selectedEquipmentIds.push(equipmentId);
+          }
+        } else {
+          selectedEquipmentIds = selectedEquipmentIds.filter(id => id !== equipmentId);
+          if (selectAllEquipment) selectAllEquipment.checked = false;
+        }
+        updateBulkActionsButton();
+      }
+    });
+    
+    function updateBulkActionsButton() {
+      const bulkBtn = document.getElementById("bulkEquipmentActionsBtn");
+      if (bulkBtn) {
+        if (selectedEquipmentIds.length > 0) {
+          bulkBtn.style.display = "inline-block";
+          bulkBtn.textContent = `${selectedEquipmentIds.length} Selected`;
+        } else {
+          bulkBtn.style.display = "none";
+        }
+      }
+    }
+    
+    // Bulk Status Update
+    async function bulkUpdateEquipmentStatus(status) {
+      if (selectedEquipmentIds.length === 0) return;
+      if (!confirm(`Update ${selectedEquipmentIds.length} equipment item(s) to "${status}"?`)) return;
+      
+      try {
+        await BulkOperationsAPI.bulkUpdateEquipmentStatus(selectedEquipmentIds, status);
+        showAlert(`${selectedEquipmentIds.length} equipment item(s) updated successfully!`, "success");
+        selectedEquipmentIds = [];
+        if (selectAllEquipment) selectAllEquipment.checked = false;
+        updateBulkActionsButton();
+        await loadEquipments();
+      } catch (error) {
+        console.error("Error updating equipment:", error);
+        showAlert("Error updating equipment: " + error.message, "danger");
+      }
+    }
+    
+    // Bulk Condition Update
+    async function bulkUpdateEquipmentCondition(condition) {
+      if (selectedEquipmentIds.length === 0) return;
+      if (!confirm(`Update condition of ${selectedEquipmentIds.length} equipment item(s) to "${condition}"?`)) return;
+      
+      try {
+        await BulkOperationsAPI.bulkUpdateEquipmentCondition(selectedEquipmentIds, condition);
+        showAlert(`${selectedEquipmentIds.length} equipment item(s) updated successfully!`, "success");
+        selectedEquipmentIds = [];
+        if (selectAllEquipment) selectAllEquipment.checked = false;
+        updateBulkActionsButton();
+        await loadEquipments();
+      } catch (error) {
+        console.error("Error updating equipment:", error);
+        showAlert("Error updating equipment: " + error.message, "danger");
+      }
+    }
+    
+    // Bulk Delete Equipment
+    async function bulkDeleteEquipment() {
+      if (selectedEquipmentIds.length === 0) return;
+      if (!confirm(`Delete ${selectedEquipmentIds.length} equipment item(s)? This action cannot be undone.`)) return;
+      
+      try {
+        await BulkOperationsAPI.bulkDeleteEquipment(selectedEquipmentIds);
+        showAlert(`${selectedEquipmentIds.length} equipment item(s) deleted successfully!`, "success");
+        selectedEquipmentIds = [];
+        if (selectAllEquipment) selectAllEquipment.checked = false;
+        updateBulkActionsButton();
+        await loadEquipments();
+      } catch (error) {
+        console.error("Error deleting equipment:", error);
+        showAlert("Error deleting equipment: " + error.message, "danger");
+      }
+    }
+    
+    // Bulk Action Event Listeners
+    document.getElementById("bulkStatusAvailable")?.addEventListener("click", () => bulkUpdateEquipmentStatus("Available"));
+    document.getElementById("bulkStatusBorrowed")?.addEventListener("click", () => bulkUpdateEquipmentStatus("Borrowed"));
+    document.getElementById("bulkStatusUnderRepair")?.addEventListener("click", () => bulkUpdateEquipmentStatus("Under Repair"));
+    document.getElementById("bulkConditionGood")?.addEventListener("click", () => bulkUpdateEquipmentCondition("Good"));
+    document.getElementById("bulkConditionDamaged")?.addEventListener("click", () => bulkUpdateEquipmentCondition("Damaged"));
+    document.getElementById("bulkDeleteEquipment")?.addEventListener("click", bulkDeleteEquipment);
+    
+    // ============================================
+    // AUTO-REFRESH NOTIFICATIONS
+    // ============================================
+    let notificationRefreshInterval = null;
+    
+    function startNotificationAutoRefresh() {
+      // Clear existing interval
+      if (notificationRefreshInterval) {
+        clearInterval(notificationRefreshInterval);
+      }
+      
+      // Refresh every 30 seconds
+      notificationRefreshInterval = setInterval(async () => {
+        try {
+          await loadNotifications();
+        } catch (error) {
+          console.error("Error auto-refreshing notifications:", error);
+        }
+      }, 30000); // 30 seconds
+    }
+    
+    function stopNotificationAutoRefresh() {
+      if (notificationRefreshInterval) {
+        clearInterval(notificationRefreshInterval);
+        notificationRefreshInterval = null;
+      }
+    }
+    
+    // Start auto-refresh when page loads
+    startNotificationAutoRefresh();
+    
+    // Stop when page is hidden (to save resources)
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopNotificationAutoRefresh();
+      } else {
+        startNotificationAutoRefresh();
+        loadNotifications(); // Refresh immediately when page becomes visible
+      }
+    });
+    
+    // Initialize on page load
+    window.addEventListener("load", async () => {
+      // Load requests for badge
+      try {
+        allRequests = await RequestsAPI.getAll();
+        updatePendingRequestsBadge();
+      } catch (error) {
+        console.error("Error loading requests for badge:", error);
+      }
+      
+      // Set interval to update badge
+      setInterval(async () => {
+        try {
+          allRequests = await RequestsAPI.getAll();
+          updatePendingRequestsBadge();
+        } catch (error) {
+          console.error("Error updating badge:", error);
+        }
+      }, 60000); // Update every minute
+
+      // Load initial section
+      const saved = localStorage.getItem('adminActiveSection') || 'dashboard';
+      switchSection(saved);
+      if (saved === 'dashboard') {
+        await loadDashboardStats();
+        await loadRecentActivity();
+      }
+    });
+  </script>
+</body>
+</html>

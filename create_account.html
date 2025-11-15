@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — CCIS E-Bulod</title>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    /* ============================================
+       DESIGN SYSTEM - Centralized Design Tokens
+       ============================================ */
+    :root {
+      /* Colors - Primary Palette */
+      --color-primary: #002b5c;
+      --color-primary-dark: #001a3d;
+      --color-primary-light: #004080;
+      --color-secondary: #ffb400;
+      --color-secondary-dark: #cc9000;
+      
+      /* Colors - Status Palette */
+      --color-success: #10b981;
+      --color-success-light: #d1fae5;
+      --color-danger: #ef4444;
+      --color-danger-light: #fee2e2;
+      --color-warning: #f59e0b;
+      --color-warning-light: #fef3c7;
+      --color-info: #0ea5e9;
+      --color-info-light: #e0f2fe;
+      
+      /* Colors - Neutral Palette */
+      --color-bg-primary: #ffffff;
+      --color-bg-secondary: #f8fafc;
+      --color-bg-tertiary: #f1f5f9;
+      --color-text-primary: #1e293b;
+      --color-text-secondary: #64748b;
+      --color-text-muted: #94a3b8;
+      --color-border: #e5e7eb;
+      --color-border-light: #f1f5f9;
+      
+      /* Typography */
+      --font-family: 'Poppins', sans-serif;
+      --font-size-base: 1rem;
+      --font-size-lg: 1.125rem;
+      --font-size-xl: 1.25rem;
+      --font-size-2xl: 1.5rem;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      
+      /* Spacing System */
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 3rem;
+      
+      /* Border Radius */
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.5rem;
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      
+      /* Transitions */
+      --transition-base: 0.2s ease;
+    }
+    
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-base);
+      min-height: 100vh;
+      padding: var(--spacing-xl) 0;
+    }
+
+    .container {
+      max-width: 900px;
+    }
+
+    .header-card {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-2xl);
+      margin-bottom: var(--spacing-xl);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .header-card h1 {
+      margin: 0;
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-2xl);
+    }
+
+    .header-card p {
+      margin: var(--spacing-md) 0 0 0;
+      opacity: 0.9;
+    }
+
+    .account-type-tabs {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+      background: var(--color-bg-primary);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .account-type-tab {
+      flex: 1;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: var(--transition-base);
+      text-align: center;
+    }
+
+    .account-type-tab:hover {
+      border-color: var(--color-primary);
+      background: var(--color-bg-secondary);
+    }
+
+    .account-type-tab.active {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .form-card {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--color-border-light);
+    }
+
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+    }
+
+    .form-label {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 0.2rem rgba(0, 43, 92, 0.25);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+      font-weight: var(--font-weight-semibold);
+      padding: var(--spacing-md) var(--spacing-xl);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+    }
+
+    .btn-secondary {
+      background-color: var(--color-text-secondary);
+      border-color: var(--color-text-secondary);
+    }
+
+    .alert-toast {
+      position: fixed;
+      top: var(--spacing-xl);
+      right: var(--spacing-xl);
+      z-index: 9999;
+      min-width: 300px;
+      max-width: 400px;
+    }
+
+    .back-link {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      transition: var(--transition-base);
+    }
+
+    .back-link:hover {
+      color: var(--color-primary);
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .password-toggle:hover {
+      color: var(--color-primary);
+    }
+
+    .required-field {
+      color: var(--color-danger);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Alert Toast Container -->
+  <div id="alertContainer" class="alert-toast"></div>
+
+  <div class="container">
+    <!-- Back Link -->
+    <a href="admin_dboard.html" class="back-link">
+      <i class="bi bi-arrow-left"></i>
+      Back to Admin Dashboard
+    </a>
+
+    <!-- Header -->
+    <div class="header-card">
+      <h1><i class="bi bi-person-plus me-2"></i>Create New Account</h1>
+      <p>Create a new admin or borrower account for the CCIS E-Bulod system</p>
+    </div>
+
+    <!-- Account Type Tabs -->
+    <div class="account-type-tabs">
+      <button class="account-type-tab active" data-type="admin">
+        <i class="bi bi-shield-check me-2"></i>Create Admin Account
+      </button>
+      <button class="account-type-tab" data-type="borrower">
+        <i class="bi bi-person me-2"></i>Create Borrower Account
+      </button>
+    </div>
+
+    <!-- Admin Account Form -->
+    <div id="adminFormSection" class="form-section active">
+      <div class="form-card">
+        <h3 class="mb-4"><i class="bi bi-shield-check me-2"></i>Admin Account Details</h3>
+        <form id="adminAccountForm">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="adminId" class="form-label">Admin ID <span class="required-field">*</span></label>
+              <input type="text" class="form-control" id="adminId" placeholder="e.g., ADMIN001" required>
+              <small class="text-muted">Unique identifier for the admin account</small>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="adminPassword" class="form-label">Password <span class="required-field">*</span></label>
+              <div class="password-wrapper">
+                <input type="password" class="form-control" id="adminPassword" placeholder="Enter password" required>
+                <button type="button" class="password-toggle" id="adminPasswordToggle">
+                  <i class="bi bi-eye" id="adminPasswordToggleIcon"></i>
+                </button>
+              </div>
+              <small class="text-muted">Minimum 6 characters</small>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="adminConfirmPassword" class="form-label">Confirm Password <span class="required-field">*</span></label>
+              <div class="password-wrapper">
+                <input type="password" class="form-control" id="adminConfirmPassword" placeholder="Confirm password" required>
+                <button type="button" class="password-toggle" id="adminConfirmPasswordToggle">
+                  <i class="bi bi-eye" id="adminConfirmPasswordToggleIcon"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-circle me-2"></i>Create Admin Account
+            </button>
+            <button type="reset" class="btn btn-secondary">
+              <i class="bi bi-x-circle me-2"></i>Clear Form
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Borrower Account Form -->
+    <div id="borrowerFormSection" class="form-section">
+      <div class="form-card">
+        <h3 class="mb-4"><i class="bi bi-person me-2"></i>Borrower Account Details</h3>
+        <form id="borrowerAccountForm">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="studentId" class="form-label">Student ID <span class="required-field">*</span></label>
+              <input type="text" class="form-control" id="studentId" placeholder="e.g., 23-140133" pattern="[0-9]{2}-[0-9]{6}" required>
+              <small class="text-muted">Format: XX-XXXXXX (e.g., 23-140133)</small>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="borrowerPassword" class="form-label">Password <span class="required-field">*</span></label>
+              <div class="password-wrapper">
+                <input type="password" class="form-control" id="borrowerPassword" placeholder="Enter password" required>
+                <button type="button" class="password-toggle" id="borrowerPasswordToggle">
+                  <i class="bi bi-eye" id="borrowerPasswordToggleIcon"></i>
+                </button>
+              </div>
+              <small class="text-muted">Minimum 6 characters</small>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="borrowerConfirmPassword" class="form-label">Confirm Password <span class="required-field">*</span></label>
+              <div class="password-wrapper">
+                <input type="password" class="form-control" id="borrowerConfirmPassword" placeholder="Confirm password" required>
+                <button type="button" class="password-toggle" id="borrowerConfirmPasswordToggle">
+                  <i class="bi bi-eye" id="borrowerConfirmPasswordToggleIcon"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="borrowerName" class="form-label">Full Name <span class="required-field">*</span></label>
+              <input type="text" class="form-control" id="borrowerName" placeholder="e.g., Juan Dela Cruz" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="borrowerEmail" class="form-label">Email <span class="required-field">*</span></label>
+              <input type="email" class="form-control" id="borrowerEmail" placeholder="e.g., juan.delacruz@email.com" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="borrowerCourse" class="form-label">Course</label>
+              <input type="text" class="form-control" id="borrowerCourse" placeholder="e.g., BSIT, BSCS">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="borrowerYearLevel" class="form-label">Year Level</label>
+              <input type="text" class="form-control" id="borrowerYearLevel" placeholder="e.g., 1st Year, 2nd Year">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="borrowerStatus" class="form-label">Status <span class="required-field">*</span></label>
+              <select class="form-select" id="borrowerStatus" required>
+                <option value="active" selected>Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-circle me-2"></i>Create Borrower Account
+            </button>
+            <button type="reset" class="btn btn-secondary">
+              <i class="bi bi-x-circle me-2"></i>Clear Form
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-I8YDtDaGJ--uIw5ppePzxutvdnHYCYg",
+      authDomain: "studio-5277928304-db252.firebaseapp.com",
+      projectId: "studio-5277928304-db252",
+      storageBucket: "studio-5277928304-db252.firebasestorage.app",
+      messagingSenderId: "489996060233",
+      appId: "1:489996060233:web:e088e281498e8499952198"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Session check - only admins can access this page
+    const adminId = localStorage.getItem("adminId");
+    if (!adminId) {
+      alert("Access denied. Admin login required.");
+      window.location.href = "index.html";
+    }
+
+    // Alert System
+    function showAlert(message, type = 'info') {
+      const alertContainer = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} alert-dismissible fade show`;
+      alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      alertContainer.innerHTML = '';
+      alertContainer.appendChild(alert);
+
+      setTimeout(() => {
+        alert.remove();
+      }, 5000);
+    }
+
+    // Tab Switching
+    document.querySelectorAll('.account-type-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const type = tab.getAttribute('data-type');
+        
+        // Update active tab
+        document.querySelectorAll('.account-type-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Update active form section
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        if (type === 'admin') {
+          document.getElementById('adminFormSection').classList.add('active');
+        } else {
+          document.getElementById('borrowerFormSection').classList.add('active');
+        }
+      });
+    });
+
+    // Password Toggle Functionality
+    function setupPasswordToggle(inputId, toggleId, iconId) {
+      const input = document.getElementById(inputId);
+      const toggle = document.getElementById(toggleId);
+      const icon = document.getElementById(iconId);
+      
+      if (toggle && input) {
+        toggle.addEventListener('click', () => {
+          const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+          input.setAttribute('type', type);
+          icon.classList.toggle('bi-eye');
+          icon.classList.toggle('bi-eye-slash');
+        });
+      }
+    }
+
+    // Setup password toggles
+    setupPasswordToggle('adminPassword', 'adminPasswordToggle', 'adminPasswordToggleIcon');
+    setupPasswordToggle('adminConfirmPassword', 'adminConfirmPasswordToggle', 'adminConfirmPasswordToggleIcon');
+    setupPasswordToggle('borrowerPassword', 'borrowerPasswordToggle', 'borrowerPasswordToggleIcon');
+    setupPasswordToggle('borrowerConfirmPassword', 'borrowerConfirmPasswordToggle', 'borrowerConfirmPasswordToggleIcon');
+
+    // Admin Account Form
+    document.getElementById('adminAccountForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const adminIdValue = document.getElementById('adminId').value.trim();
+      const password = document.getElementById('adminPassword').value;
+      const confirmPassword = document.getElementById('adminConfirmPassword').value;
+
+      // Validation
+      if (password.length < 6) {
+        showAlert('Password must be at least 6 characters long.', 'warning');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showAlert('Passwords do not match.', 'warning');
+        return;
+      }
+
+      try {
+        // Check if admin already exists
+        const adminDoc = await db.collection('admins').doc(adminIdValue).get();
+        
+        if (adminDoc.exists) {
+          showAlert('Admin account with this ID already exists.', 'warning');
+          return;
+        }
+
+        // Create admin account
+        await db.collection('admins').doc(adminIdValue).set({
+          password: password,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: adminId
+        });
+
+        showAlert(`Admin account "${adminIdValue}" created successfully!`, 'success');
+        
+        // Reset form
+        document.getElementById('adminAccountForm').reset();
+        
+        // Optional: Auto-switch to borrower form
+        // setTimeout(() => {
+        //   document.querySelector('[data-type="borrower"]').click();
+        // }, 2000);
+      } catch (error) {
+        console.error('Error creating admin account:', error);
+        showAlert('Error creating admin account. Please try again.', 'danger');
+      }
+    });
+
+    // Borrower Account Form
+    document.getElementById('borrowerAccountForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const studentId = document.getElementById('studentId').value.trim();
+      const password = document.getElementById('borrowerPassword').value;
+      const confirmPassword = document.getElementById('borrowerConfirmPassword').value;
+      const name = document.getElementById('borrowerName').value.trim();
+      const email = document.getElementById('borrowerEmail').value.trim();
+      const course = document.getElementById('borrowerCourse').value.trim();
+      const yearLevel = document.getElementById('borrowerYearLevel').value.trim();
+      const status = document.getElementById('borrowerStatus').value;
+
+      // Validation
+      if (!/^\d{2}-\d{6}$/.test(studentId)) {
+        showAlert('Invalid Student ID format. Please use format: XX-XXXXXX (e.g., 23-140133)', 'warning');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAlert('Password must be at least 6 characters long.', 'warning');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showAlert('Passwords do not match.', 'warning');
+        return;
+      }
+
+      if (!name) {
+        showAlert('Please enter the borrower\'s full name.', 'warning');
+        return;
+      }
+
+      if (!email) {
+        showAlert('Please enter the borrower\'s email.', 'warning');
+        return;
+      }
+
+      try {
+        // Check if borrower already exists
+        const borrowerDoc = await db.collection('borrowers').doc(studentId).get();
+        
+        if (borrowerDoc.exists) {
+          showAlert('Borrower account with this Student ID already exists.', 'warning');
+          return;
+        }
+
+        // Create borrower account
+        await db.collection('borrowers').doc(studentId).set({
+          password: password,
+          name: name,
+          email: email,
+          course: course || null,
+          yearLevel: yearLevel || null,
+          status: status,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: adminId
+        });
+
+        showAlert(`Borrower account "${studentId}" created successfully!`, 'success');
+        
+        // Reset form
+        document.getElementById('borrowerAccountForm').reset();
+      } catch (error) {
+        console.error('Error creating borrower account:', error);
+        showAlert('Error creating borrower account. Please try again.', 'danger');
+      }
+    });
+  </script>
+</body>
+</html>
+
