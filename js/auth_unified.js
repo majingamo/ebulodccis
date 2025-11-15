@@ -52,7 +52,11 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("🔍 Attempting login for:", studentId);
 
       // Use API endpoint for authentication
-      const response = await fetch('api/auth', {
+      const apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'api/' 
+        : '/api/';
+      
+      const response = await fetch(apiBase + 'auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
