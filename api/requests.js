@@ -113,7 +113,7 @@ module.exports = async (req, res) => {
               borrowedAt: new Date().toISOString()
             });
             
-            await createDocument('equipmentHistory', {
+            await createDocument('equipment_history', {
               equipmentId: request.equipmentId,
               equipmentName: request.equipmentName,
               borrowerId: request.borrowerId,
@@ -231,7 +231,7 @@ module.exports = async (req, res) => {
             
             await updateDocument('equipments', request.equipmentId, equipmentUpdate);
             
-            await createDocument('equipmentHistory', {
+            await createDocument('equipment_history', {
               equipmentId: request.equipmentId,
               equipmentName: request.equipmentName,
               borrowerId: request.borrowerId,
