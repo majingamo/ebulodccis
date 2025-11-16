@@ -1624,6 +1624,18 @@
       document.getElementById("requestEquipmentName").value = equipmentName;
       document.getElementById("requestEquipmentDisplay").value = equipmentName;
       
+      // Set minimum date to today (prevents selecting past dates)
+      const requestDateInput = document.getElementById("requestDate");
+      if (requestDateInput) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
+        requestDateInput.setAttribute('min', todayStr);
+        requestDateInput.value = ''; // Clear any previous selection
+      }
+      
       // Clear and reset the barcode scanner input
       const barcodeInput = document.getElementById("barcodeScannerInput");
       if (barcodeInput) {
@@ -1866,6 +1878,16 @@
       // Validate required fields
       if (!requestDate) {
         showAlert("Please select a request date", "warning");
+        return;
+      }
+      
+      // Validate that request date is not in the past
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(requestDate);
+      selectedDate.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        showAlert("Request date cannot be in the past. Please select today or a future date.", "warning");
         return;
       }
 
