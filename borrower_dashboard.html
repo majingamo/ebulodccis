@@ -1355,11 +1355,11 @@
     async function loadDashboardStats() {
       try {
         // Load requests, equipment, and borrower data in parallel with caching
-        const apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'api/' : '/api/';
+        // Use shorter cache TTL for borrower data (5 seconds) to ensure trust points are up-to-date
         const [requests, equipment, borrowerData] = await Promise.all([
           getCachedData('requests', () => RequestsAPI.getAll({ borrowerId: borrowerId }), 10000),
           getCachedData('equipment', () => EquipmentAPI.getAll(), 30000),
-          getCachedData('borrower', () => fetch(`${apiBase}borrowers?id=${borrowerId}`).then(r => r.json()).then(d => d.data), 30000)
+          getCachedData('borrower', () => BorrowersAPI.getById(borrowerId), 5000) // Reduced TTL to 5 seconds for fresh trust points
         ]);
         
         let pending = 0;
@@ -2346,9 +2346,14 @@
         
         document.getElementById("reviewForm").reset();
         
-        // Clear cache and reload
+        // Clear cache and reload (including borrower cache since trust points changed)
         clearCache('requests');
-        await loadMyRequests();
+        clearCache('borrower'); // Clear borrower cache to refresh trust points
+        clearCache('stats');
+        await Promise.all([
+          loadMyRequests(),
+          loadDashboardStats() // Reload stats to show updated trust points
+        ]);
       } catch (error) {
         console.error("Error submitting feedback:", error);
         let errorMessage = "Error submitting feedback. Please try again.";
@@ -2653,6 +2658,9 @@
     window.addEventListener("load", async () => {
       // Initialize barcode scanner
       initializeBarcodeScanner();
+      
+      // Clear all caches on page load to ensure fresh data (especially trust points)
+      clearCache();
       
       // Load initial notification count
       await loadInitialNotifications();
