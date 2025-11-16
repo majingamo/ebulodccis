@@ -234,6 +234,7 @@ module.exports = async (req, res) => {
             
             // Calculate trust points changes
             let pointsChange = 0;
+            let newTrustPoints = null; // Store separately, not in updateData
             const pointsReasons = [];
             
             // Check if return is late (30-60 minutes or more after scheduled endTime)
@@ -269,13 +270,12 @@ module.exports = async (req, res) => {
             // Update trust points if there's a change
             if (pointsChange !== 0) {
               try {
-                const newPoints = await updateTrustPoints(
+                newTrustPoints = await updateTrustPoints(
                   request.borrowerId,
                   pointsChange,
                   `Equipment return: ${pointsReasons.join(', ')}`
                 );
-                updateData.trustPointsChange = pointsChange;
-                updateData.newTrustPoints = newPoints;
+                // Don't store trust points data in updateData - it's already tracked in equipment_history and activity_logs
               } catch (error) {
                 console.error('Error updating trust points:', error);
                 // Continue with return even if trust points update fails
@@ -303,7 +303,7 @@ module.exports = async (req, res) => {
                 equipmentName: request.equipmentName,
                 requestId: requestId,
                 trustPointsChange: pointsChange || 0,
-                newTrustPoints: updateData.newTrustPoints || null
+                newTrustPoints: newTrustPoints || null
               }),
               read: false,
               timestamp: returnedAt.toISOString()
@@ -394,13 +394,12 @@ module.exports = async (req, res) => {
             // Add 1 trust point for submitting feedback (only if not already reviewed)
             if (!alreadyReviewed) {
               try {
-                const newPoints = await updateTrustPoints(
+                await updateTrustPoints(
                   request.borrowerId,
                   1,
                   'Submitted equipment feedback'
                 );
-                updateData.trustPointsChange = 1;
-                updateData.newTrustPoints = newPoints;
+                // Don't store trust points data in updateData - it's already tracked in activity_logs
               } catch (error) {
                 console.error('Error updating trust points for feedback:', error);
                 // Continue with review even if trust points update fails
