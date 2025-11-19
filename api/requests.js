@@ -447,11 +447,11 @@ module.exports = async (req, res) => {
       // This is a new request creation
       validateRequired(data, ['borrowerId', 'equipmentId', 'equipmentName', 'purpose']);
       
-      // Check if borrower has trust points (must be >= 1 to borrow)
+      // Check if borrower has trust points (must be >= 2 to borrow)
       const trustPoints = await getTrustPoints(data.borrowerId);
-      if (trustPoints !== null && trustPoints < 1) {
+      if (trustPoints !== null && trustPoints < 2) {
         const response = sendError(
-          'You cannot borrow equipment because your trust points are below 1. Please visit the Dean\'s office for an appeal.',
+          'You cannot borrow equipment because your trust points are below 2. Please visit the Dean\'s office for an appeal.',
           403
         );
         res.status(response.statusCode).json(JSON.parse(response.body));
