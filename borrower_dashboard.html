@@ -837,7 +837,7 @@
               <div id="trustPointsWarning" style="display: none;">
                 <div class="alert alert-warning mb-0" style="padding: 12px 16px; border-radius: 8px;">
                   <i class="bi bi-exclamation-triangle me-2"></i>
-                  <strong>Cannot Borrow:</strong> Your trust points have reached 0. Please visit the Dean's office for an appeal.
+                  <strong>Cannot Borrow:</strong> Your trust points are below 1. Please visit the Dean's office for an appeal.
                 </div>
               </div>
             </div>
@@ -1385,10 +1385,10 @@
         const trustPoints = borrowerData?.trustPoints || borrowerData?.trust_points || 20;
         document.getElementById("trustPoints").textContent = trustPoints;
         
-        // Show warning if trust points are 0
+        // Show warning if trust points are below 1
         const trustPointsWarning = document.getElementById("trustPointsWarning");
         const trustPointsStatus = document.getElementById("trustPointsStatus");
-        if (trustPoints <= 0) {
+        if (trustPoints < 1) {
           trustPointsWarning.style.display = 'block';
           trustPointsStatus.textContent = "⚠️ Cannot borrow equipment";
           trustPointsStatus.style.color = "#ef4444";
@@ -1611,8 +1611,8 @@
         const borrowerData = await fetch(`${apiBase}borrowers?id=${borrowerId}`).then(r => r.json()).then(d => d.data);
         const trustPoints = borrowerData?.trustPoints || borrowerData?.trust_points || 20;
         
-        if (trustPoints <= 0) {
-          showAlert("You cannot borrow equipment because your trust points have reached 0. Please visit the Dean's office for an appeal.", "danger");
+        if (trustPoints < 1) {
+          showAlert("You cannot borrow equipment because your trust points are below 1. Please visit the Dean's office for an appeal.", "danger");
           return;
         }
       } catch (error) {

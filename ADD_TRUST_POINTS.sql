@@ -10,7 +10,9 @@ UPDATE borrowers
 SET trust_points = 20 
 WHERE trust_points IS NULL;
 
--- Ensure trust_points cannot be negative (enforce minimum of 0)
+-- Ensure trust_points cannot be below 1 (enforce minimum of 1)
 ALTER TABLE borrowers 
-ADD CONSTRAINT check_trust_points_min CHECK (trust_points >= 0);
+DROP CONSTRAINT IF EXISTS check_trust_points_min;
+ALTER TABLE borrowers 
+ADD CONSTRAINT check_trust_points_min CHECK (trust_points >= 1);
 

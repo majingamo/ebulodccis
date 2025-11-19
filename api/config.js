@@ -293,11 +293,11 @@ async function updateTrustPoints(borrowerId, pointsChange, reason = '') {
     // Calculate new points
     const calculatedPoints = currentPoints + pointsChange;
     
-    // Ensure minimum is 0 (never go negative)
-    // If calculation would result in negative, set to 0
-    const newPoints = Math.max(0, calculatedPoints);
+    // Ensure minimum is 1 (never go below 1)
+    // If calculation would result in less than 1, set to 1
+    const newPoints = Math.max(1, calculatedPoints);
     
-    // Calculate actual points change (may be less than requested if it would go negative)
+    // Calculate actual points change (may be less than requested if it would go below 1)
     const actualPointsChange = newPoints - currentPoints;
     
     console.log(`Updating trust points for ${borrowerId}:`, {
