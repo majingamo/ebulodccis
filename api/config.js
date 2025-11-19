@@ -283,7 +283,8 @@ async function updateTrustPoints(borrowerId, pointsChange, reason = '') {
     }
     
     // Get current points (handle both camelCase and snake_case, and NULL values)
-    let currentPoints = borrower.trustPoints || borrower.trust_points;
+    // Use nullish coalescing to handle 0 as a valid value (not falsy)
+    let currentPoints = borrower.trustPoints ?? borrower.trust_points ?? null;
     if (currentPoints === null || currentPoints === undefined || isNaN(currentPoints)) {
       currentPoints = 20; // Default to 20 if not set
     }
@@ -336,7 +337,8 @@ async function getTrustPoints(borrowerId) {
     if (!borrower) {
       return null;
     }
-    let points = borrower.trustPoints || borrower.trust_points;
+    // Use nullish coalescing to handle 0 as a valid value (not falsy)
+    let points = borrower.trustPoints ?? borrower.trust_points ?? null;
     if (points === null || points === undefined || isNaN(points)) {
       points = 20; // Default to 20 if not set
     }
