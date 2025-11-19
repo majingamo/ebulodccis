@@ -282,9 +282,32 @@ async function updateTrustPoints(borrowerId, pointsChange, reason = '') {
       throw new Error(`Borrower ${borrowerId} not found`);
     }
     
-    const currentPoints = borrower.trustPoints || borrower.trust_points || 20;
-    const newPoints = Math.max(0, currentPoints + pointsChange); // Ensure minimum is 0
+    // Get current points (handle both camelCase and snake_case, and NULL values)
+    let currentPoints = borrower.trustPoints || borrower.trust_points;
+    if (currentPoints === null || currentPoints === undefined || isNaN(currentPoints)) {
+      currentPoints = 20; // Default to 20 if not set
+    }
+    currentPoints = parseInt(currentPoints, 10); // Ensure it's an integer
     
+    // Calculate new points
+    const calculatedPoints = currentPoints + pointsChange;
+    
+    // Ensure minimum is 0 (never go negative)
+    // If calculation would result in negative, set to 0
+    const newPoints = Math.max(0, calculatedPoints);
+    
+    // Calculate actual points change (may be less than requested if it would go negative)
+    const actualPointsChange = newPoints - currentPoints;
+    
+    console.log(`Updating trust points for ${borrowerId}:`, {
+      currentPoints,
+      requestedChange: pointsChange,
+      calculatedPoints,
+      newPoints,
+      actualChange: actualPointsChange
+    });
+    
+    // Update the borrower's trust points
     await updateDocument('borrowers', borrowerId, {
       trustPoints: newPoints
     });
@@ -293,7 +316,8 @@ async function updateTrustPoints(borrowerId, pointsChange, reason = '') {
     await logActivity('update_trust_points', {
       borrowerId: borrowerId,
       previousPoints: currentPoints,
-      pointsChange: pointsChange,
+      requestedPointsChange: pointsChange,
+      actualPointsChange: actualPointsChange,
       newPoints: newPoints,
       reason: reason
     }, borrowerId, 'borrower');
@@ -312,7 +336,11 @@ async function getTrustPoints(borrowerId) {
     if (!borrower) {
       return null;
     }
-    return borrower.trustPoints || borrower.trust_points || 20;
+    let points = borrower.trustPoints || borrower.trust_points;
+    if (points === null || points === undefined || isNaN(points)) {
+      points = 20; // Default to 20 if not set
+    }
+    return parseInt(points, 10); // Ensure it's an integer
   } catch (error) {
     console.error('Failed to get trust points:', error);
     return null;

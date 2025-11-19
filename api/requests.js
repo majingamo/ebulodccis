@@ -270,16 +270,21 @@ module.exports = async (req, res) => {
             // Update trust points if there's a change
             if (pointsChange !== 0) {
               try {
+                console.log(`Updating trust points for borrower ${request.borrowerId}: ${pointsChange} points (${pointsReasons.join(', ')})`);
                 newTrustPoints = await updateTrustPoints(
                   request.borrowerId,
                   pointsChange,
                   `Equipment return: ${pointsReasons.join(', ')}`
                 );
+                console.log(`Trust points updated successfully. New points: ${newTrustPoints}`);
                 // Don't store trust points data in updateData - it's already tracked in equipment_history and activity_logs
               } catch (error) {
                 console.error('Error updating trust points:', error);
-                // Continue with return even if trust points update fails
+                console.error('Error details:', error.message, error.stack);
+                // Continue with return even if trust points update fails, but log the error
               }
+            } else {
+              console.log(`No trust points change for borrower ${request.borrowerId} (pointsChange = 0)`);
             }
             
             await updateDocument('equipments', request.equipmentId, equipmentUpdate);
@@ -394,16 +399,21 @@ module.exports = async (req, res) => {
             // Add 1 trust point for submitting feedback (only if not already reviewed)
             if (!alreadyReviewed) {
               try {
-                await updateTrustPoints(
+                console.log(`Adding 1 trust point for feedback submission by borrower ${request.borrowerId}`);
+                const newTrustPoints = await updateTrustPoints(
                   request.borrowerId,
                   1,
                   'Submitted equipment feedback'
                 );
+                console.log(`Trust points updated successfully for feedback. New points: ${newTrustPoints}`);
                 // Don't store trust points data in updateData - it's already tracked in activity_logs
               } catch (error) {
                 console.error('Error updating trust points for feedback:', error);
+                console.error('Error details:', error.message, error.stack);
                 // Continue with review even if trust points update fails
               }
+            } else {
+              console.log(`Borrower ${request.borrowerId} already reviewed this request, skipping trust points update`);
             }
             
             await logActivity('submit_review', {
