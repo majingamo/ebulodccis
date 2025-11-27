@@ -265,6 +265,9 @@ module.exports = async (req, res) => {
             } else if (data.returnCondition === 'Damaged') {
               pointsChange -= 5;
               pointsReasons.push('Damaged condition on return: -5 points');
+            }  else if (data.returnCondition === 'Late' ){
+              pointsChange -= 2;
+              pointsReasons.push('Late condition on return: -2 points');
             }
             
             // Update trust points if there's a change
