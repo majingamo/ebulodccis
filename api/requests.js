@@ -263,8 +263,8 @@ module.exports = async (req, res) => {
               pointsChange += 1;
               pointsReasons.push('Good condition on return: +1 point');
             } else if (data.returnCondition === 'Damaged') {
-              pointsChange -= 5;
-              pointsReasons.push('Damaged condition on return: -5 points');
+              pointsChange -= 8;
+              pointsReasons.push('Damaged condition on return: -8 points');
             }  else if (data.returnCondition === 'Late' ){
               pointsChange -= 2;
               pointsReasons.push('Late condition on return: -2 points');
