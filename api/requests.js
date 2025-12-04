@@ -260,14 +260,14 @@ module.exports = async (req, res) => {
             
             // Condition-based points
             if (data.returnCondition === 'Good') {
-              pointsChange += 1;
+              pointsChange += 2;
               pointsReasons.push('Good condition on return: +1 point');
             } else if (data.returnCondition === 'Damaged') {
-              pointsChange -= 8;
-              pointsReasons.push('Damaged condition on return: -8 points');
+              pointsChange -= 15;
+              pointsReasons.push('Damaged condition on return: -15 points');
             }  else if (data.returnCondition === 'Late' ){
-              pointsChange -= 2;
-              pointsReasons.push('Late condition on return: -2 points');
+              pointsChange -= 10;
+              pointsReasons.push('Late condition on return: -10 points');
             }
             
             // Update trust points if there's a change
